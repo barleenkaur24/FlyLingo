@@ -1,0 +1,216 @@
+/* === LOGIN STYLESHEET (JAL OMOTENASHI DESIGN) === */
+
+:root {
+      --jal-kurenai: #BA0C2F;
+      --jal-kurenai-dark: #8A001E;
+      --sumi-black: #0A1118;
+      --washi-cream: #F9F8F5;
+      --card-white: #FFFFFF;
+      --tatami-border: #E8E5DF;
+      --slate-text: #1E293B;
+      --muted-gray: #64748B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; }
+    
+    body {
+      background: #EDEAE4;
+      background-image: radial-gradient(#D8D4CC 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--slate-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    /* Lifecycle Stepper */
+    .lifecycle-stepper {
+      width: 100%;
+      max-width: 560px;
+      background: var(--card-white);
+      border-radius: 30px;
+      border: 1px solid var(--tatami-border);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(10,17,24,0.04);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted-gray);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    .step-item.active {
+      background: var(--jal-kurenai);
+      color: white;
+    }
+    .step-arrow { color: #CBD5E1; font-size: 11px; }
+
+    /* Login Box */
+    .login-container-card {
+      max-width: 540px;
+      width: 100%;
+      background: var(--card-white);
+      border-radius: 20px;
+      box-shadow: 0 20px 48px rgba(10, 17, 24, 0.1);
+      border: 1px solid var(--tatami-border);
+      overflow: hidden;
+    }
+    .login-hdr-bar {
+      background: var(--sumi-black);
+      color: white;
+      padding: 24px 28px;
+      text-align: center;
+      border-bottom: 4px solid var(--jal-kurenai);
+    }
+    .login-brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+    .login-brand-sub {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 3px;
+    }
+
+    .login-card-body {
+      padding: 28px;
+    }
+
+    /* Role Tabs */
+    .segmented-role-row {
+      display: flex;
+      background: #F1EFEA;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      gap: 4px;
+    }
+    .tab-click-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-click-btn.active {
+      background: white;
+      color: var(--sumi-black);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .form-group-line {
+      margin-bottom: 18px;
+    }
+    .field-tag-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .login-txt-box {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--tatami-border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      background: #FDFBF8;
+      transition: border-color 0.2s;
+    }
+    .login-txt-box:focus {
+      border-color: var(--jal-kurenai);
+      box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.1);
+    }
+    .help-hint-line {
+      font-size: 11px;
+      color: var(--muted-gray);
+      margin-top: 4px;
+    }
+
+    .btn-login-main {
+      width: 100%;
+      background: var(--jal-kurenai);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(186, 12, 47, 0.25);
+      transition: background 0.2s;
+      margin-top: 10px;
+    }
+    .btn-login-main:hover {
+      background: var(--jal-kurenai-dark);
+    }
+
+    /* Judge 1-Click Fast Fill */
+    .fast-track-box {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--tatami-border);
+      text-align: center;
+    }
+    .fast-track-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .fast-track-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .fast-track-btn {
+      background: #F8F7F4;
+      border: 1px solid var(--tatami-border);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--slate-text);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .fast-track-btn:hover {
+      border-color: var(--jal-kurenai);
+      background: #FFF5F5;
+    }
+
+    .err-callout {
+      display: none;
+      background: #FEE2E2;
+      color: #991B1B;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+      border: 1px solid #FCA5A5;
+    }

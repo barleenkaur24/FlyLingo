@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Japan Airlines — In-Flight Edge Gateway & Domain Firewall</title>
+  <style>
+    :root {
+      --jal-kurenai: #C8102E;
+      --sumi-navy: #0A1118;
+      --washi-bg: #F8F7F4;
+      --card-white: #FFFFFF;
+      --border-line: #E2DFD8;
+      --slate-text: #1E293B;
+      --muted-gray: #64748B;
+      --matcha-green: #10B981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", sans-serif; }
+    body {
+      background: var(--washi-bg);
+      color: var(--slate-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+    }
+
+    .gateway-container {
+      max-width: 900px;
+      width: 100%;
+    }
+
+    /* Header */
+    .jal-banner {
+      background: var(--sumi-navy);
+      color: white;
+      border-radius: 18px;
+      padding: 28px 32px;
+      border-bottom: 4px solid var(--jal-kurenai);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(10,17,24,0.08);
+    }
+    .brand-side {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .crane-crest {
+      width: 44px;
+      height: 44px;
+      background: var(--jal-kurenai);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 22px;
+      box-shadow: 0 4px 12px rgba(200, 16, 46, 0.4);
+    }
+    .banner-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+    .banner-sub {
+      font-size: 12px;
+      color: #94A3B8;
+      margin-top: 4px;
+    }
+
+    /* Privacy Firewall Wall Diagram */
+    .firewall-card {
+      background: var(--card-white);
+      border: 1px solid var(--border-line);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 28px;
+      text-align: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    }
+    .firewall-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #EFF6FF;
+      color: #1E40AF;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+      border: 1px solid #BFDBFE;
+    }
+    .firewall-title {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .firewall-desc {
+      font-size: 13px;
+      color: var(--muted-gray);
+      max-width: 680px;
+      margin: 0 auto 18px auto;
+      line-height: 1.5;
+    }
+
+    /* Two Domains Grid */
+    .domains-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .domain-card {
+      background: var(--card-white);
+      border: 2px solid var(--border-line);
+      border-radius: 18px;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+      position: relative;
+    }
+    .domain-card:hover {
+      border-color: var(--jal-kurenai);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(200, 16, 46, 0.08);
+    }
+    .domain-icon-glyph {
+      font-size: 38px;
+      margin-bottom: 12px;
+    }
+    .domain-name-pill {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+    .p-pill { background: #E0E7FF; color: #3730A3; }
+    .c-pill { background: #FEF3C7; color: #92400E; }
+
+    .domain-h {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .domain-desc {
+      font-size: 13px;
+      color: var(--muted-gray);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .privacy-rules-box {
+      background: #F8F7F4;
+      border: 1px dashed var(--border-line);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 12px;
+      margin-bottom: 20px;
+      text-align: left;
+    }
+    .rule-line {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 4px;
+      color: #334155;
+    }
+    .rule-line:last-child { margin-bottom: 0; }
+
+    .enter-btn {
+      display: block;
+      text-align: center;
+      background: var(--sumi-navy);
+      color: white;
+      text-decoration: none;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+    .enter-btn:hover {
+      background: var(--jal-kurenai);
+    }
+
+    @media (max-width: 720px) {
+      .domains-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="gateway-container">
+    <!-- JAL Header -->
+    <div class="jal-banner">
+      <div class="brand-side">
+        <div class="crane-crest">鶴</div>
+        <div>
+          <div class="banner-title">JAPAN AIRLINES</div>
+          <div class="banner-sub">AIR-GAPPED IN-FLIGHT GATEWAY &amp; DOMAIN FIREWALL</div>
+        </div>
+      </div>
+      <div style="font-size: 13px; font-weight: 700; background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px;">
+        FLIGHT JL 740 • B787-9
+      </div>
+    </div>
+
+    <!-- Onboard Privacy Firewall Wall -->
+    <div class="firewall-card">
+      <div class="firewall-badge">
+        <span>🛡️</span> <span>DOMAIN ISOLATION &amp; PRIVACY WALL ACTIVE</span>
+      </div>
+      <div class="firewall-title">Zero-Knowledge Passenger &amp; Crew Separation</div>
+      <div class="firewall-desc">
+        To comply with international civil aviation regulations and privacy laws, passengers and cabin attendants operate on distinct local virtual domains. Neither party can view the other's confidential personal records.
+      </div>
+
+      <div style="display: flex; justify-content: center; align-items: center; gap: 20px; font-size: 13px; font-weight: 700; color: #475569;">
+        <span>📱 Passenger Mobile Domain</span>
+        <span style="color: var(--jal-kurenai); font-size: 18px;">&harr; [ Privacy Firewall ] &harr;</span>
+        <span>🧑‍✈️ Crew Tablet Operations Domain</span>
+      </div>
+    </div>
+
+    <!-- The Two Distinct Domains -->
+    <div class="domains-grid">
+
+      <!-- Domain 1: Passenger Mobile PWA -->
+      <div class="domain-card">
+        <div>
+          <div class="domain-icon-glyph">📱</div>
+          <div class="domain-name-pill p-pill">DOMAIN: passenger.jal.local</div>
+          <div class="domain-h">Passenger In-Flight Companion (乗客用)</div>
+          <div class="domain-desc">
+            Optimized for smartphone screens (iPhone/Android). Provides bilingual Hindi/English voice input, visual assistance tiles, and seat-level tracking.
+          </div>
+
+          <div class="privacy-rules-box">
+            <div class="rule-line"><span>🔒</span> <strong>Crew Privacy Wall:</strong></div>
+            <div class="rule-line" style="color: #64748B; font-size: 11px;">Attendant personal identity &amp; employee IDs remain hidden. Displayed only as "Cabin Attendant".</div>
+          </div>
+        </div>
+
+        <a href="/passenger" class="enter-btn">
+          Open Passenger Mobile Portal &rarr;
+        </a>
+      </div>
+
+      <!-- Domain 2: Cabin Crew Operations Tablet -->
+      <div class="domain-card">
+        <div>
+          <div class="domain-icon-glyph">🧑‍✈️</div>
+          <div class="domain-name-pill c-pill">DOMAIN: ops.jal.local</div>
+          <div class="domain-h">Cabin Crew Operations Station (客室乗務員端末)</div>
+          <div class="domain-desc">
+            Optimized for landscape tablets (iPad / Toughbook). Features full aircraft schematic, real-time green/red seat lighting, boarding sequence, and Priority Queue Array.
+          </div>
+
+          <div class="privacy-rules-box">
+            <div class="rule-line"><span>🔒</span> <strong>Passenger Privacy Wall:</strong></div>
+            <div class="rule-line" style="color: #64748B; font-size: 11px;">Passenger personal passports, DOB, and contacts are sanitized. Displays only seat number and assistance needs.</div>
+          </div>
+        </div>
+
+        <a href="/crew" class="enter-btn">
+          Open Crew Operations Tablet &rarr;
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Quick Links Bar -->
+    <div style="display: flex; justify-content: center; gap: 16px; font-size: 12px; color: #64748B;">
+      <a href="/ticket" style="color: inherit; text-decoration: underline;">🎫 View Boarding Pass (JL740)</a>
+      <span>•</span>
+      <a href="/form" style="color: inherit; text-decoration: underline;">📝 Pre-Flight Registration Form</a>
+      <span>•</span>
+      <a href="/login" style="color: inherit; text-decoration: underline;">🔐 In-Flight Login Portal</a>
+    </div>
+  </div>
+
+</body>
+</html>

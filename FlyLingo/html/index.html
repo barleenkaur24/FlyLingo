@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Japan Airlines — In-Flight Edge Gateway & Domain Firewall</title>
+  <link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+
+  <div class="gateway-container">
+    <!-- JAL Header -->
+    <div class="jal-banner">
+      <div class="brand-side">
+        <div class="crane-crest">鶴</div>
+        <div>
+          <div class="banner-title">JAPAN AIRLINES</div>
+          <div class="banner-sub">AIR-GAPPED IN-FLIGHT GATEWAY &amp; DOMAIN FIREWALL</div>
+        </div>
+      </div>
+      <div style="font-size: 13px; font-weight: 700; background: rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 20px;">
+        FLIGHT JL 740 • B787-9
+      </div>
+    </div>
+
+    <!-- Onboard Privacy Firewall Wall -->
+    <div class="firewall-card">
+      <div class="firewall-badge">
+        <span>🛡️</span> <span>DOMAIN ISOLATION &amp; PRIVACY WALL ACTIVE</span>
+      </div>
+      <div class="firewall-title">Zero-Knowledge Passenger &amp; Crew Separation</div>
+      <div class="firewall-desc">
+        To comply with international civil aviation regulations and privacy laws, passengers and cabin attendants operate on distinct local virtual domains. Neither party can view the other's confidential personal records.
+      </div>
+
+      <div style="display: flex; justify-content: center; align-items: center; gap: 20px; font-size: 13px; font-weight: 700; color: #475569;">
+        <span>📱 Passenger Mobile Domain</span>
+        <span style="color: var(--jal-kurenai); font-size: 18px;">&harr; [ Privacy Firewall ] &harr;</span>
+        <span>🧑‍✈️ Crew Tablet Operations Domain</span>
+      </div>
+    </div>
+
+    <!-- The Two Distinct Domains -->
+    <div class="domains-grid">
+
+      <!-- Domain 1: Passenger Mobile PWA -->
+      <div class="domain-card">
+        <div>
+          <div class="domain-icon-glyph">📱</div>
+          <div class="domain-name-pill p-pill">DOMAIN: passenger.jal.local</div>
+          <div class="domain-h">Passenger In-Flight Companion (乗客用)</div>
+          <div class="domain-desc">
+            Optimized for smartphone screens (iPhone/Android). Provides bilingual Hindi/English voice input, visual assistance tiles, and seat-level tracking.
+          </div>
+
+          <div class="privacy-rules-box">
+            <div class="rule-line"><span>🔒</span> <strong>Crew Privacy Wall:</strong></div>
+            <div class="rule-line" style="color: #64748B; font-size: 11px;">Attendant personal identity &amp; employee IDs remain hidden. Displayed only as "Cabin Attendant".</div>
+          </div>
+        </div>
+
+        <a href="/passenger" class="enter-btn">
+          Open Passenger Mobile Portal &rarr;
+        </a>
+      </div>
+
+      <!-- Domain 2: Cabin Crew Operations Tablet -->
+      <div class="domain-card">
+        <div>
+          <div class="domain-icon-glyph">🧑‍✈️</div>
+          <div class="domain-name-pill c-pill">DOMAIN: ops.jal.local</div>
+          <div class="domain-h">Cabin Crew Operations Station (客室乗務員端末)</div>
+          <div class="domain-desc">
+            Optimized for landscape tablets (iPad / Toughbook). Features full aircraft schematic, real-time green/red seat lighting, boarding sequence, and Priority Queue Array.
+          </div>
+
+          <div class="privacy-rules-box">
+            <div class="rule-line"><span>🔒</span> <strong>Passenger Privacy Wall:</strong></div>
+            <div class="rule-line" style="color: #64748B; font-size: 11px;">Passenger personal passports, DOB, and contacts are sanitized. Displays only seat number and assistance needs.</div>
+          </div>
+        </div>
+
+        <a href="/crew" class="enter-btn">
+          Open Crew Operations Tablet &rarr;
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Quick Links Bar -->
+    <div style="display: flex; justify-content: center; gap: 16px; font-size: 12px; color: #64748B;">
+      <a href="/ticket" style="color: inherit; text-decoration: underline;">🎫 View Boarding Pass (JL740)</a>
+      <span>•</span>
+      <a href="/form" style="color: inherit; text-decoration: underline;">📝 Pre-Flight Registration Form</a>
+      <span>•</span>
+      <a href="/login" style="color: inherit; text-decoration: underline;">🔐 In-Flight Login Portal</a>
+    </div>
+  </div>
+
+</body>
+</html>

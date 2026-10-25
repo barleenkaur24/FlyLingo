@@ -1,0 +1,2546 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAL Purser Operations Tablet (客室乗務員端末) — JL740</title>
+  <style>
+    /* =====================================================================
+       Nihon no Dentoshoku (日本の伝統色彩美) & Dynamic Aviation Avionics
+       Japanese Airlines Luxury Cabin Station Theme
+       ===================================================================== */
+    :root {
+      /* Traditional Japanese Harmonies */
+      --ai-midnight: #050A14;         /* 濃藍 / 藍色 (Deep Midnight Indigo) */
+      --aizome-deep: #0A1426;         /* 藍染 (Japanese Indigo Wash) */
+      --konjou-slate: #112035;        /* 紺青 (Prussian Blue Slate) */
+      --kuro-urushi: #0F172A;         /* 黒漆 (Black Lacquer) */
+      --tsuru-kurenai: #C8102E;       /* JAL 鶴丸の深紅 (Crimson Crane) */
+      --kurenai-glow: rgba(200, 16, 46, 0.45);
+      --yamabuki-gold: #E5A93C;       /* 山吹色 (Imperial Yamabuki Gold) */
+      --kinpaku-amber: #D97706;       /* 金箔 (Gold Foil Accent) */
+      --moegi-green: #10B981;         /* 萌黄 (Matcha / Sensor Green) */
+      --sakura-mist: #F43F5E;         /* 桜霞 (Sakura Twilight Accent) */
+      --asagi-cyan: #00A3FF;          /* 浅葱 (Luminous Water Cyan) */
+      --shinju-pearl: #F8FAFC;        /* 真珠色 (Pearl White Text) */
+      --ginzumi-silver: #94A3B8;      /* 銀鼠 (Silver Mist Subtext) */
+      --hairline-gold: rgba(229, 169, 60, 0.25);
+      --hairline-border: rgba(255, 255, 255, 0.08);
+
+      /* Legacy compatibility mappings */
+      --jal-kurenai: var(--tsuru-kurenai);
+      --sumi-navy: var(--kuro-urushi);
+      --tablet-bg: var(--ai-midnight);
+      --card-white: rgba(15, 23, 42, 0.82);
+      --border-line: rgba(255, 255, 255, 0.08);
+      --slate-dark: #FFFFFF;
+      --text-muted: var(--ginzumi-silver);
+      --matcha-green: var(--moegi-green);
+      --yamabuki-amber: var(--yamabuki-gold);
+      --akane-red: #EF4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--ai-midnight);
+      /* Japanese Seigaiha (青海波) Atmospheric Canvas Background */
+      background-image: 
+        radial-gradient(ellipse 90% 50% at 50% -10%, rgba(200, 16, 46, 0.16) 0%, transparent 60%),
+        radial-gradient(ellipse 70% 40% at 85% 100%, rgba(0, 163, 255, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 10% 40%, rgba(229, 169, 60, 0.06) 0%, transparent 40%),
+        linear-gradient(180deg, #060B15 0%, #0B172A 50%, #050A14 100%);
+      color: var(--shinju-pearl);
+      padding: 16px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Living Atmospheric Shimmer */
+    .atmospheric-shimmer {
+      position: fixed;
+      top: 0; left: 0; right: 0; height: 100%;
+      background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.025) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+      animation: mistFlow 16s ease-in-out infinite alternate;
+    }
+    @keyframes mistFlow {
+      from { transform: translateY(-10px) scale(1); }
+      to { transform: translateY(15px) scale(1.05); }
+    }
+
+    /* Seigaiha (青海波) Motif Wave Accent Strip */
+    .seigaiha-crest-strip {
+      height: 4px;
+      width: 100%;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--tsuru-kurenai) 0px,
+        var(--tsuru-kurenai) 24px,
+        var(--yamabuki-gold) 24px,
+        var(--yamabuki-gold) 48px,
+        #1E3A8A 48px,
+        #1E3A8A 72px
+      );
+      border-radius: 2px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 12px rgba(200, 16, 46, 0.5);
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Top Domain Isolation Bar */
+    .domain-wall-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--hairline-border);
+      backdrop-filter: blur(12px);
+      border-radius: 10px;
+      font-size: 11px;
+      color: var(--ginzumi-silver);
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 5;
+    }
+    .domain-badge-secure {
+      background: rgba(2, 6, 23, 0.8);
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .privacy-tag-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--yamabuki-gold);
+      font-weight: 700;
+    }
+
+    /* Tablet Operational Header with Japanese Luxury Aesthetics */
+    .tablet-nav-bar {
+      background: linear-gradient(135deg, rgba(17, 32, 53, 0.85) 0%, rgba(10, 20, 38, 0.95) 100%);
+      color: white;
+      border-radius: 18px;
+      padding: 16px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--hairline-gold);
+      border-bottom: 3.5px solid var(--tsuru-kurenai);
+      margin-bottom: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(14px);
+      position: relative;
+      z-index: 5;
+    }
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .crane-emblem {
+      width: 42px;
+      height: 42px;
+      background: radial-gradient(circle, #E11D48 0%, #9F1239 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      color: #FFFFFF;
+      box-shadow: 0 0 16px rgba(225, 29, 72, 0.6), inset 0 2px 4px rgba(255,255,255,0.4);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      animation: tsuruBreathe 3s infinite ease-in-out;
+    }
+    @keyframes tsuruBreathe {
+      0%, 100% { box-shadow: 0 0 14px rgba(225, 29, 72, 0.5); }
+      50% { box-shadow: 0 0 24px rgba(225, 29, 72, 0.9), 0 0 35px rgba(245, 158, 11, 0.4); }
+    }
+    .brand-titles h1 {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #FFFFFF;
+    }
+    .brand-titles .purser-meta {
+      font-size: 11px;
+      color: var(--yamabuki-gold);
+      font-weight: 700;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Avionics Telemetry Strip */
+    .telemetry-strip {
+      display: flex;
+      gap: 16px;
+      font-size: 11px;
+      background: rgba(8, 16, 32, 0.8);
+      padding: 8px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(229, 169, 60, 0.25);
+    }
+    .tel-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .tel-label {
+      font-size: 9px;
+      color: var(--ginzumi-silver);
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .tel-val {
+      font-weight: 900;
+      color: #38BDF8;
+      font-family: monospace;
+      font-size: 13px;
+    }
+
+    /* In-Flight Phase & Boarding Progress Bar */
+    .phase-bar {
+      background: rgba(15, 23, 42, 0.75);
+      border: 1px solid var(--hairline-border);
+      backdrop-filter: blur(12px);
+      border-radius: 14px;
+      padding: 12px 20px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      position: relative;
+      z-index: 5;
+    }
+    .phase-info-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .phase-badge-text {
+      font-size: 13px;
+      font-weight: 800;
+      color: #F8FAFC;
+    }
+    .board-track-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .progress-bar-bg {
+      width: 200px;
+      height: 9px;
+      background: rgba(2, 6, 23, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10B981 0%, #34D399 100%);
+      width: 0%;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+      transition: width 0.3s;
+    }
+    .board-counter-label {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--yamabuki-gold);
+    }
+    .skip-btn-pill {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(229, 169, 60, 0.3);
+      color: #F8FAFC;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .skip-btn-pill:hover {
+      background: var(--tsuru-kurenai);
+      border-color: var(--tsuru-kurenai);
+      box-shadow: 0 0 12px rgba(200, 16, 46, 0.5);
+    }
+
+    /* Dual-Pane Tablet Grid Layout */
+    .tablet-main-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 20px;
+      flex: 1;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* ========================================================
+       aeroLOPA Authentic Aircraft Cabin Cutaway Architecture
+       Japanese Dynamic Luxury Aesthetics
+       ======================================================== */
+    .aerolopa-container {
+      background: linear-gradient(135deg, rgba(19, 34, 56, 0.85) 0%, rgba(11, 21, 40, 0.95) 100%);
+      border: 1.5px solid var(--hairline-gold);
+      border-radius: 20px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      z-index: 5;
+    }
+    .aerolopa-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .aerolopa-brand-lockup {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .aerolopa-circle-emblem {
+      width: 44px;
+      height: 44px;
+      border: 2px solid var(--yamabuki-gold);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--yamabuki-gold);
+      font-weight: 900;
+      background: rgba(229, 169, 60, 0.08);
+      box-shadow: 0 0 12px rgba(229, 169, 60, 0.25);
+    }
+    .aerolopa-circle-emblem .aero-txt { font-size: 8px; font-weight: 700; }
+    .aerolopa-circle-emblem .lopa-txt { font-size: 11px; font-weight: 900; letter-spacing: 0.5px; }
+
+    .aerolopa-title-group h2 {
+      font-size: 16px;
+      font-weight: 900;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .aerolopa-title-group .meta {
+      font-size: 11px;
+      color: var(--yamabuki-gold);
+      font-weight: 700;
+    }
+
+    /* Cabin Atmosphere Mood Lighting Switcher */
+    .mood-light-switch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,0,0,0.35);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--hairline-border);
+      font-size: 11px;
+      color: var(--ginzumi-silver);
+    }
+    .mood-btn {
+      padding: 4px 10px;
+      border-radius: 12px;
+      border: none;
+      font-size: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      color: #CBD5E1;
+      background: rgba(255,255,255,0.06);
+      transition: all 0.2s;
+    }
+    .mood-btn:hover {
+      background: rgba(255,255,255,0.15);
+      color: white;
+    }
+    .mood-btn.active {
+      background: var(--tsuru-kurenai);
+      color: white;
+      box-shadow: 0 0 10px var(--tsuru-kurenai);
+    }
+
+    /* aeroLOPA Class Tabs */
+    .aerolopa-nav-tabs {
+      display: flex;
+      gap: 18px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .lopa-tab {
+      padding-bottom: 4px;
+      color: var(--ginzumi-silver);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+    }
+    .lopa-tab.tab-first {
+      color: var(--yamabuki-gold);
+      border-bottom: 3px solid var(--yamabuki-gold);
+    }
+    .lopa-tab.tab-biz {
+      color: #38BDF8;
+      border-bottom: 3px solid #38BDF8;
+    }
+    .lopa-tab.tab-econ {
+      color: var(--tsuru-kurenai);
+      border-bottom: 3px solid var(--tsuru-kurenai);
+    }
+
+    /* Scrollable Fuselage Stage */
+    .aerolopa-fuselage-stage {
+      width: 100%;
+      overflow-x: auto;
+      padding: 12px 0 20px 0;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+    }
+
+    /* Dynamic Airflow Slipstream Lines */
+    .airflow-stream-top, .airflow-stream-bottom {
+      position: absolute;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(56, 189, 248, 0.7) 50%, transparent 100%);
+      width: 240px;
+      animation: airflowSlip 2.5s infinite linear;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .airflow-stream-top { top: 6px; left: 140px; }
+    .airflow-stream-bottom { bottom: 12px; left: 240px; animation-delay: 1.25s; }
+    @keyframes airflowSlip {
+      0% { transform: translateX(-120px); opacity: 0; }
+      50% { opacity: 0.9; }
+      100% { transform: translateX(750px); opacity: 0; }
+    }
+
+    /* Horizontal aeroLOPA Aircraft Fuselage Cutaway */
+    .aerolopa-fuselage {
+      background: radial-gradient(circle at 50% 50%, #152744 0%, #0F1D33 80%, #0B1626 100%);
+      border: 2.5px solid #475569;
+      border-radius: 110px 30px 30px 110px;
+      position: relative;
+      padding: 16px 20px 16px 125px; /* space for cockpit */
+      display: inline-flex;
+      align-items: center;
+      min-width: 930px;
+      box-shadow: 0 0 35px rgba(0, 163, 255, 0.12), inset 0 2px 14px rgba(0,0,0,0.6);
+      transition: background 0.5s ease-in-out;
+    }
+
+    /* Cockpit Nose (Points Left) */
+    .lopa-nose-cone {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 115px;
+      background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%);
+      border-right: 2px solid rgba(229, 169, 60, 0.3);
+      border-radius: 106px 0 0 106px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-left: 14px;
+      box-shadow: inset 4px 0 16px rgba(0,0,0,0.6);
+    }
+    .cockpit-glass-visor {
+      width: 36px;
+      height: 58px;
+      background: #020617;
+      border-radius: 20px 4px 4px 20px;
+      border: 2px solid #00A3FF;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 0 12px rgba(0, 163, 255, 0.4);
+    }
+    .cockpit-glass-visor::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 50%;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.6) 0%, transparent 100%);
+    }
+    .cockpit-glass-visor::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(45deg, transparent 40%, rgba(0, 163, 255, 0.35) 50%, transparent 60%);
+      animation: cockpitRadarSweep 2.2s infinite linear;
+    }
+    @keyframes cockpitRadarSweep {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(100%); }
+    }
+
+    /* Backlit Windows Strip along Top & Bottom Hull */
+    .lopa-windows-top, .lopa-windows-bottom {
+      position: absolute;
+      left: 125px;
+      right: 24px;
+      height: 8px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .lopa-windows-top { top: 4px; }
+    .lopa-windows-bottom { bottom: 4px; }
+    .lopa-win-capsule {
+      width: 14px;
+      height: 7px;
+      background: #E0F2FE;
+      border: 1px solid #38BDF8;
+      border-radius: 4px;
+      box-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    }
+
+    /* Monument Blocks (Galleys & Lavatories) */
+    .lopa-monument-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 220px;
+      margin-right: 16px;
+    }
+    .lopa-lavatory-box {
+      width: 44px;
+      height: 48px;
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 0 14px rgba(2, 132, 199, 0.5);
+      border: 1.5px solid #38BDF8;
+    }
+    .lopa-galley-box {
+      width: 44px;
+      height: 48px;
+      background: linear-gradient(135deg, #334155 0%, #1E293B 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--yamabuki-gold);
+      font-size: 18px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      border: 1.5px solid var(--yamabuki-gold);
+    }
+
+    /* Cabin Rows Grid (Rows 20 to 26) */
+    .lopa-rows-grid {
+      display: flex;
+      gap: 14px;
+      position: relative;
+    }
+
+    /* Seat Column (Row) */
+    .lopa-seat-row-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 220px;
+      align-items: center;
+    }
+    .lopa-cluster-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .lopa-aisle-marker {
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      color: var(--yamabuki-gold);
+      font-family: monospace;
+      background: rgba(11, 21, 40, 0.9);
+      padding: 0 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(229, 169, 60, 0.4);
+      box-shadow: 0 0 8px rgba(229, 169, 60, 0.2);
+    }
+
+    /* Authentic aeroLOPA Angled / Contoured Airline Seat Pod */
+    .lopa-seat-unit {
+      width: 52px;
+      height: 30px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1.5px solid #475569;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding: 2px 4px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .lopa-seat-unit:hover {
+      transform: scale(1.14);
+      z-index: 20;
+      border-color: #38BDF8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
+    }
+    .lopa-seat-unit:active {
+      transform: scale(0.95);
+    }
+    .lopa-seat-unit .lopa-cushion {
+      width: 24px;
+      height: 22px;
+      background: #1E3A8A; /* Traditional Indigo Velvet Cushion */
+      border-radius: 5px;
+      margin-right: 6px;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+      transition: background 0.2s;
+    }
+    .lopa-seat-unit .lopa-label {
+      font-size: 10px;
+      font-weight: 900;
+      color: #CBD5E1;
+      letter-spacing: -0.2px;
+    }
+
+    /* Seated / Boarded */
+    .lopa-seat-unit.boarded .lopa-cushion {
+      background: #0F172A;
+    }
+    .lopa-seat-unit.boarded .lopa-label {
+      color: #94A3B8;
+    }
+
+    /* Active Service Request (Green) */
+    .lopa-seat-unit.call-green {
+      border-color: #10B981 !important;
+      background: rgba(16, 185, 129, 0.22) !important;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.85) !important;
+      animation: lopaGlowGreen 1.2s infinite ease-in-out !important;
+    }
+    .lopa-seat-unit.call-green .lopa-cushion {
+      background: #10B981 !important;
+    }
+    @keyframes lopaGlowGreen {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 12px rgba(16, 185, 129, 0.7); }
+      50% { transform: scale(1.12); box-shadow: 0 0 24px rgba(16, 185, 129, 1); }
+    }
+
+    /* In Progress / Attendant En Route (Amber) */
+    .lopa-seat-unit.resolving-amber {
+      border-color: var(--yamabuki-gold) !important;
+      background: rgba(229, 169, 60, 0.22) !important;
+      box-shadow: 0 0 18px rgba(229, 169, 60, 0.85) !important;
+      animation: lopaGlowAmber 1.4s infinite ease-in-out !important;
+    }
+    .lopa-seat-unit.resolving-amber .lopa-cushion {
+      background: var(--yamabuki-gold) !important;
+    }
+    @keyframes lopaGlowAmber {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    /* Emergency High-Voltage Alert (Red) */
+    .lopa-seat-unit.alert-red {
+      border-color: var(--tsuru-kurenai) !important;
+      background: rgba(200, 16, 46, 0.25) !important;
+      box-shadow: 0 0 26px rgba(200, 16, 46, 1) !important;
+      animation: lopaShockwaveRed 0.5s infinite alternate !important;
+      z-index: 25;
+    }
+    .lopa-seat-unit.alert-red .lopa-cushion {
+      background: var(--tsuru-kurenai) !important;
+    }
+    @keyframes lopaShockwaveRed {
+      from { transform: scale(1); box-shadow: 0 0 12px rgba(200, 16, 46, 0.8); }
+      to { transform: scale(1.18); box-shadow: 0 0 30px rgba(200, 16, 46, 1), 0 0 45px rgba(245, 158, 11, 0.6); }
+    }
+
+    /* Floating Holographic Seat Inspector HUD (Pop-up Card) */
+    .seat-inspector-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 320px;
+      background: rgba(11, 21, 40, 0.95);
+      border: 1.5px solid var(--yamabuki-gold);
+      border-radius: 14px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(229, 169, 60, 0.35);
+      backdrop-filter: blur(14px);
+      z-index: 200;
+      display: none;
+      animation: slideUpPopup 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUpPopup {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .inspector-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .inspector-seat-badge {
+      background: var(--yamabuki-gold);
+      color: #0F172A;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .inspector-close-btn {
+      background: transparent;
+      border: none;
+      color: #94A3B8;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .inspector-detail-row {
+      font-size: 11px;
+      color: #CBD5E1;
+      line-height: 1.5;
+      margin-bottom: 10px;
+    }
+    .inspector-actions-row {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-inspect-action {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Right Pane: Priority Queue Array & Actions */
+    .queue-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Pinned Medical Emergency Alert Banner */
+    .pinned-emergency-card {
+      display: none;
+      background: rgba(200, 16, 46, 0.18);
+      border: 2px solid var(--tsuru-kurenai);
+      border-radius: 14px;
+      padding: 16px 20px;
+      animation: bannerPulse 1s infinite alternate;
+    }
+    @keyframes bannerPulse {
+      from { background: rgba(200, 16, 46, 0.15); box-shadow: 0 0 10px rgba(200, 16, 46, 0.4); }
+      to { background: rgba(200, 16, 46, 0.28); box-shadow: 0 0 24px rgba(200, 16, 46, 0.8); }
+    }
+    .pinned-em-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: #FCA5A5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .pinned-em-msg {
+      font-size: 12px;
+      color: #FEE2E2;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    /* Priority Queue Array Card */
+    .queue-container {
+      background: rgba(15, 23, 42, 0.82);
+      border-radius: 16px;
+      border: 1px solid var(--hairline-border);
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(14px);
+      flex: 1;
+    }
+    .queue-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .queue-heading-jp {
+      font-size: 14px;
+      font-weight: 800;
+      color: #F8FAFC;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .queue-badge-count {
+      background: var(--tsuru-kurenai);
+      color: white;
+      font-size: 11px;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-weight: 700;
+      box-shadow: 0 0 8px rgba(200, 16, 46, 0.5);
+    }
+
+    /* Queue Array Cards */
+    .queue-feed-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .q-request-item {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 6px solid #64748B;
+      border-radius: 12px;
+      padding: 16px 18px;
+      transition: all 0.2s;
+    }
+    .q-request-item.NORMAL {
+      border-left-color: var(--moegi-green);
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+    .q-request-item.RESOLVING {
+      border-left-color: var(--yamabuki-gold);
+      background: rgba(229, 169, 60, 0.08);
+      border-color: rgba(229, 169, 60, 0.25);
+    }
+    .q-request-item.HIGH, .q-request-item.EMERGENCY {
+      border-left-color: var(--tsuru-kurenai);
+      background: rgba(200, 16, 46, 0.15);
+      border-width: 2px;
+      border-left-width: 8px;
+      box-shadow: 0 0 20px rgba(200, 16, 46, 0.35);
+    }
+
+    .q-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .seat-badge-box {
+      background: var(--yamabuki-gold);
+      color: #0F172A;
+      font-weight: 900;
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+    }
+    .q-index-pill {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--ginzumi-silver);
+    }
+    .priority-badge-pill {
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 4px;
+    }
+    .priority-badge-pill.HIGH { background: rgba(239, 68, 68, 0.3); color: #FCA5A5; border: 1px solid #EF4444; }
+    .priority-badge-pill.NORMAL { background: rgba(16, 185, 129, 0.2); color: #86EFAC; border: 1px solid #10B981; }
+    .priority-badge-pill.RESOLVING { background: rgba(229, 169, 60, 0.2); color: #FDE68A; border: 1px solid var(--yamabuki-gold); }
+
+    /* Japanese Keigo Phrase Styling */
+    .keigo-phrase-jp {
+      font-size: 18px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin: 8px 0 4px 0;
+      line-height: 1.4;
+    }
+    .romaji-reading-sub {
+      font-size: 12px;
+      color: var(--yamabuki-gold);
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+    .passenger-sanitized-speech {
+      background: rgba(0,0,0,0.3);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #E2E8F0;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .q-btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-tablet-action {
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-resolving { background: var(--yamabuki-gold); color: #0F172A; }
+    .btn-resolving:hover { background: #D97706; box-shadow: 0 0 10px rgba(229, 169, 60, 0.5); }
+    .btn-delivered { background: #10B981; color: white; }
+    .btn-delivered:hover { background: #059669; box-shadow: 0 0 10px rgba(16, 185, 129, 0.5); }
+    .btn-tts { background: rgba(51, 65, 85, 0.8); color: #F8FAFC; border: 1px solid rgba(255,255,255,0.1); }
+    .btn-tts:hover { background: rgba(71, 85, 105, 0.9); }
+
+    /* Fast Demonstrator Panel for Judges */
+    .fast-demo-panel {
+      background: rgba(15, 23, 42, 0.82);
+      border-radius: 16px;
+      border: 1px solid var(--hairline-gold);
+      padding: 16px 20px;
+      backdrop-filter: blur(14px);
+    }
+    .demo-heading {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--yamabuki-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .demo-grid-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .demo-tap-box {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #F8FAFC;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .demo-tap-box:hover {
+      border-color: var(--yamabuki-gold);
+      background: rgba(51, 65, 85, 0.9);
+      box-shadow: 0 0 12px rgba(229, 169, 60, 0.3);
+    }
+
+    /* =====================================================================
+       Cinematic 3D Flight Takeoff Modal & PFD Glass Cockpit HUD
+       ===================================================================== */
+    .takeoff-overlay-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 60%, #0D1E36 0%, #050B15 70%, #02050A 100%);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 20px;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+    }
+
+    /* Skip button in corner */
+    .takeoff-dismiss-btn {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #CBD5E1;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 50;
+      transition: all 0.2s;
+    }
+    .takeoff-dismiss-btn:hover {
+      background: rgba(200, 16, 46, 0.8);
+      color: white;
+      border-color: #C8102E;
+    }
+
+    /* Dynamic Sky Stars Background */
+    .stars-layer {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 90px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 240px 60px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 320px 180px, #fff, rgba(0,0,0,0));
+      background-repeat: repeat;
+      background-size: 350px 350px;
+      opacity: 0.5;
+      animation: starsDrift 6s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes starsDrift {
+      from { transform: translateY(0); }
+      to { transform: translateY(350px); }
+    }
+
+    /* Rushing Clouds Effect */
+    .clouds-passing {
+      position: absolute;
+      inset: -100px;
+      background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08) 0%, transparent 65%);
+      animation: cloudRush 2s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes cloudRush {
+      0% { transform: translateY(-50%) scale(0.8); opacity: 0; }
+      50% { opacity: 0.8; }
+      100% { transform: translateY(50%) scale(1.4); opacity: 0; }
+    }
+
+    /* Header & Boarding Done Pill */
+    .takeoff-header-box {
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      animation: fadeInDown 0.6s ease-out;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .boarding-done-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1.5px solid #10B981;
+      color: #34D399;
+      padding: 6px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      box-shadow: 0 0 18px rgba(16, 185, 129, 0.6);
+      margin-bottom: 12px;
+      animation: pulseGreenPill 1.5s infinite;
+    }
+    @keyframes pulseGreenPill {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 14px rgba(16, 185, 129, 0.5); }
+      50% { transform: scale(1.04); box-shadow: 0 0 24px rgba(16, 185, 129, 0.9); }
+    }
+    .takeoff-title-main {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #FFFFFF;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+    }
+    .takeoff-sub-meta {
+      font-size: 12px;
+      color: #94A3B8;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* Center Stage: Aircraft Climb & Runway Visual */
+    .flight-stage-center {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+
+    /* 3D Perspective Runway */
+    .runway-perspective-box {
+      position: absolute;
+      bottom: -30px;
+      width: 220px;
+      height: 270px;
+      transform: perspective(300px) rotateX(75deg);
+      background: linear-gradient(180deg, #111827 0%, #030712 100%);
+      border-left: 4px dashed rgba(245, 158, 11, 0.85);
+      border-right: 4px dashed rgba(245, 158, 11, 0.85);
+      overflow: hidden;
+      box-shadow: 0 0 30px rgba(245, 158, 11, 0.35);
+      animation: runwayRecede 4.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    .runway-center-stripes {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 8px;
+      height: 1000%;
+      background: repeating-linear-gradient(180deg, #FFFFFF, #FFFFFF 30px, transparent 30px, transparent 60px);
+      animation: runwayCenterScroll 0.28s linear infinite;
+    }
+    @keyframes runwayCenterScroll {
+      from { transform: translateX(-50%) translateY(0); }
+      to { transform: translateX(-50%) translateY(-60px); }
+    }
+    @keyframes runwayRecede {
+      0% { transform: perspective(300px) rotateX(75deg) translateY(0); opacity: 1; }
+      50% { transform: perspective(300px) rotateX(75deg) translateY(60px); opacity: 0.85; }
+      80% { transform: perspective(300px) rotateX(75deg) translateY(180px); opacity: 0.1; }
+      100% { transform: perspective(300px) rotateX(75deg) translateY(240px); opacity: 0; }
+    }
+
+    /* High-Tech Vector Aircraft Silhouette (Boeing 787 Dreamliner) */
+    .dreamliner-jet-craft {
+      position: relative;
+      width: 220px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: jetClimbFlight 4.5s cubic-bezier(0.25, 1, 0.35, 1) forwards;
+      filter: drop-shadow(0 0 25px rgba(56, 189, 248, 0.8));
+      z-index: 20;
+    }
+    @keyframes jetClimbFlight {
+      0% {
+        transform: translateY(60px) scale(0.85) rotate(0deg);
+      }
+      25% {
+        transform: translateY(35px) scale(0.95) rotate(-6deg);
+      }
+      60% {
+        transform: translateY(-30px) scale(1.15) rotate(-16deg);
+      }
+      85% {
+        transform: translateY(-80px) scale(1.3) rotate(-8deg);
+      }
+      100% {
+        transform: translateY(-50px) scale(1.2) rotate(0deg);
+      }
+    }
+
+    /* Jet Exhaust Plasma Plumes */
+    .jet-exhaust-left, .jet-exhaust-right {
+      position: absolute;
+      bottom: 24px;
+      width: 8px;
+      height: 60px;
+      background: linear-gradient(180deg, #38BDF8 0%, rgba(14, 165, 233, 0.8) 40%, transparent 100%);
+      border-radius: 4px;
+      filter: blur(1.5px);
+      animation: enginePlume 0.15s infinite alternate;
+    }
+    .jet-exhaust-left { left: 74px; }
+    .jet-exhaust-right { right: 74px; }
+    @keyframes enginePlume {
+      from { height: 50px; opacity: 0.85; transform: scaleX(0.9); }
+      to { height: 80px; opacity: 1; transform: scaleX(1.15); }
+    }
+
+    /* Wing Anti-Collision Strobes */
+    .wing-strobe-port {
+      position: absolute;
+      top: 96px; left: 8px;
+      width: 7px; height: 7px;
+      background: #EF4444;
+      border-radius: 50%;
+      box-shadow: 0 0 14px #EF4444;
+      animation: portStrobe 0.8s infinite;
+    }
+    .wing-strobe-stbd {
+      position: absolute;
+      top: 96px; right: 8px;
+      width: 7px; height: 7px;
+      background: #10B981;
+      border-radius: 50%;
+      box-shadow: 0 0 14px #10B981;
+      animation: stbdStrobe 0.8s infinite;
+    }
+    @keyframes portStrobe {
+      0%, 90% { opacity: 0.3; }
+      95%, 100% { opacity: 1; transform: scale(1.6); }
+    }
+    @keyframes stbdStrobe {
+      0%, 90% { opacity: 0.3; }
+      95%, 100% { opacity: 1; transform: scale(1.6); }
+    }
+
+    /* Modern Glass Cockpit PFD Avionics HUD */
+    .avionics-pfd-hud {
+      width: 100%;
+      max-width: 580px;
+      background: rgba(15, 23, 42, 0.88);
+      border: 1.5px solid rgba(56, 189, 248, 0.4);
+      border-radius: 18px;
+      padding: 14px 22px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(56, 189, 248, 0.2);
+      backdrop-filter: blur(14px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+    .hud-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .hud-label {
+      font-size: 9px;
+      color: #94A3B8;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .hud-digit-green {
+      font-size: 24px;
+      font-weight: 900;
+      color: #34D399;
+      font-family: monospace;
+      text-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+    }
+    .hud-digit-cyan {
+      font-size: 24px;
+      font-weight: 900;
+      color: #38BDF8;
+      font-family: monospace;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.7);
+    }
+    .hud-digit-gold {
+      font-size: 24px;
+      font-weight: 900;
+      color: #F59E0B;
+      font-family: monospace;
+      text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+    }
+
+    /* Phase Progress Ticker */
+    .flight-phase-ticker {
+      font-size: 12px;
+      font-weight: 800;
+      color: #E2E8F0;
+      text-align: center;
+      margin-top: 8px;
+      letter-spacing: 0.5px;
+    }
+      to { transform: translateX(-28px); }
+    }
+
+    /* Mobile & Split-Screen Tablet Responsiveness */
+    .action-btn-wide:active, .skip-btn-pill:active {
+      transform: scale(0.97);
+    }
+    @media (max-width: 960px) {
+      .tablet-main-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .telemetry-strip {
+        gap: 10px;
+        padding: 4px 10px;
+      }
+      .domain-wall-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 8px 6px;
+      }
+      .tablet-nav-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 12px;
+      }
+      .telemetry-strip {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-radius: 8px;
+        text-align: center;
+      }
+      .phase-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 10px 14px;
+      }
+      .board-track-wrap {
+        width: 100%;
+      }
+      .progress-bar-bg {
+        flex: 1;
+      }
+      .card-actions-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  
+    /* Crew Tablet Indian Medicine Dossier Display */
+    .crew-med-dossier-box {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1.5px solid #10B981;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin: 10px 0;
+    }
+    .crew-med-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .crew-med-pill {
+      font-size: 11px;
+      font-weight: 800;
+      color: #6EE7B7;
+      background: rgba(16, 185, 129, 0.25);
+      padding: 2px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .crew-med-origin {
+      font-size: 10px;
+      color: #A7F3D0;
+      font-weight: 700;
+    }
+    .crew-med-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .crew-med-col {
+      background: rgba(0, 0, 0, 0.35);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .crew-label {
+      font-size: 10px;
+      color: #94A3B8;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .crew-val {
+      font-size: 14px;
+      font-weight: 800;
+      margin-top: 2px;
+    }
+    .crew-val.brand-val { color: #FFFFFF; }
+    .crew-val.inn-val { color: #6EE7B7; }
+    .crew-val.jp-val { color: #FDE047; }
+    .crew-sub {
+      font-size: 10px;
+      color: #CBD5E1;
+      margin-top: 2px;
+    }
+    .crew-med-purpose {
+      font-size: 11px;
+      color: #E2E8F0;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .crew-med-advisory {
+      font-size: 11px;
+      color: #FCA5A5;
+      background: rgba(239, 68, 68, 0.15);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border-left: 3px solid #EF4444;
+      line-height: 1.4;
+    }
+
+  
+    /* Crew Tablet Instant Complaint & Instruction Resolution Toolkit */
+    .btn-res-action {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #F8FAFC;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+    .btn-res-action:hover {
+      background: #2563EB;
+      border-color: #38BDF8;
+      color: #FFFFFF;
+      transform: translateY(-1px);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+    .priority-badge-pill.COMPLAINT {
+      background: rgba(239, 68, 68, 0.25);
+      color: #FCA5A5;
+      border: 1px solid #EF4444;
+    }
+    .priority-badge-pill.INSTRUCTION {
+      background: rgba(245, 158, 11, 0.25);
+      color: #FDE68A;
+      border: 1px solid #F59E0B;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="atmospheric-shimmer"></div>
+  <div class="seigaiha-crest-strip"></div>
+
+  <!-- Top Domain & Privacy Wall Banner -->
+  <div class="domain-wall-header">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <div class="domain-badge-secure">
+        <span>🔒</span> <span>DOMAIN: ops.jal.local</span> <span>(Operations Network)</span>
+      </div>
+      <a href="/surveillance" target="_blank" style="background:#0F172A; color:#38BDF8; padding:3px 10px; border-radius:12px; font-weight:700; text-decoration:none; display:inline-flex; align-items:center; gap:5px; font-size:11px; border:1px solid #334155;">
+        🛰️ Master Surveillance Cockpit &rarr;
+      </a>
+    </div>
+    <div class="privacy-tag-right">
+      <span>🛡️</span> <span>Passenger PII Masked: Zero-Knowledge Gateway Active</span>
+    </div>
+  </div>
+
+  <!-- Tablet Operations Bar -->
+  <div class="tablet-nav-bar">
+    <div class="brand-section">
+      <div class="crane-emblem">鶴</div>
+      <div class="brand-titles">
+        <h1>JAPAN AIRLINES • CABIN CREW STATION (客室乗務員端末)</h1>
+        <div class="purser-meta">Lead Purser: Yukiko Tanaka • Assigned: Economy Zone B (Rows 20-26)</div>
+      </div>
+    </div>
+
+    <!-- Telemetry Strip -->
+    <div class="telemetry-strip">
+      <div class="tel-item">
+        <span class="tel-label">Altitude</span>
+        <span class="tel-val">35,000 FT</span>
+      </div>
+      <div class="tel-item">
+        <span class="tel-label">Airspeed</span>
+        <span class="tel-val">890 KM/H</span>
+      </div>
+      <div class="tel-item">
+        <span class="tel-label">Outside</span>
+        <span class="tel-val">-52°C</span>
+      </div>
+      <div class="tel-item">
+        <span class="tel-label">Waypoint</span>
+        <span class="tel-val" style="color: var(--yamabuki-gold);">MT. FUJI 🗻</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flight Status & Boarding Progress Bar -->
+  <div class="phase-bar">
+    <div class="phase-info-box">
+      <span style="font-size: 18px;">✈️</span>
+      <div>
+        <div style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">CABIN PHASE</div>
+        <div class="phase-badge-text" id="tabletPhaseStatus">Boarding in Progress... (搭乗案内中)</div>
+      </div>
+    </div>
+
+    <div class="board-track-wrap">
+      <div class="board-counter-label" id="boardProgressLabel">Boarded: 0 / 42 (0%)</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="tabletBoardFill"></div>
+      </div>
+    </div>
+
+    <div>
+      <button class="skip-btn-pill" onclick="skipToTakeoffNow()">⚡ Skip to Takeoff</button>
+      <button class="skip-btn-pill" onclick="playChime()" style="margin-left: 6px;">🔔 Chime</button>
+    </div>
+  </div>
+
+    <!-- ========================================================
+       aeroLOPA High-Fidelity Cabin Cutaway Schematic (Full-Width)
+       ======================================================== -->
+  <div class="aerolopa-container">
+    <div class="aerolopa-header">
+      <div class="aerolopa-brand-lockup">
+        <div class="aerolopa-circle-emblem">
+          <span class="aero-txt">aero</span>
+          <span class="lopa-txt">LOPA</span>
+        </div>
+        <div class="aerolopa-title-group">
+          <h2>JAPAN AIRLINES • BOEING 787-9 (JL 740)</h2>
+          <div class="meta">ARCHITECTURAL CABIN LOPA • TOKYO HANEDA FLIGHT DECK AVIONICS</div>
+        </div>
+      </div>
+
+      <!-- Living Cabin Atmosphere Mood Lighting Switcher -->
+      <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+        <div class="mood-light-switch">
+          <span>Cabin Atmosphere:</span>
+          <button class="mood-btn active" id="moodBtnSakura" onclick="setMoodAtmosphere('sakura')">🌸 Sakura</button>
+          <button class="mood-btn" id="moodBtnIndigo" onclick="setMoodAtmosphere('indigo')">🌊 Indigo</button>
+          <button class="mood-btn" id="moodBtnZen" onclick="setMoodAtmosphere('zen')">🌿 Zen</button>
+        </div>
+
+        <div class="aerolopa-nav-tabs">
+          <span class="lopa-tab tab-first">La Première</span>
+          <span class="lopa-tab tab-biz">Business</span>
+          <span class="lopa-tab tab-econ">JAL SKY WIDER (Economy Zone B)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scrollable Horizontal Fuselage Stage -->
+    <div class="aerolopa-fuselage-stage">
+      <div class="airflow-stream-top"></div>
+      <div class="airflow-stream-bottom"></div>
+      <div class="aerolopa-fuselage" id="lopaFuselageHull">
+        <!-- Top Windows Along Fuselage Hull -->
+        <div class="lopa-windows-top">
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+        </div>
+        <!-- Bottom Windows Along Fuselage Hull -->
+        <div class="lopa-windows-bottom">
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+          <div class="lopa-win-capsule"></div>
+        </div>
+
+        <!-- Cockpit Nose Cone (Left Facing) -->
+        <div class="lopa-nose-cone">
+          <div class="cockpit-glass-visor"></div>
+          <div style="font-size: 8px; font-weight: 900; color: #475569; margin-top: 6px; letter-spacing: 0.5px;">FLIGHT DECK</div>
+          <div style="font-size: 7px; color: #94A3B8; font-weight: 700;">AVIONICS ON</div>
+        </div>
+
+        <!-- Forward Monuments Column (Cyan Lavatories & Charcoal Galley) -->
+        <div class="lopa-monument-col">
+          <div class="lopa-lavatory-box" title="Forward Port Lavatory (L1)">🚻</div>
+          <div class="lopa-galley-box" title="Forward Service Galley">☕</div>
+          <div class="lopa-lavatory-box" title="Forward Starboard Lavatory (R1)">🚻</div>
+        </div>
+
+        <!-- Cabin Rows Grid (Rows 20 to 26 dynamically injected by JS) -->
+        <div class="lopa-rows-grid" id="lopaRowsGrid">
+          <!-- Dynamically populated by buildSchematic() -->
+        </div>
+
+        <!-- Mid Monuments Column (Accessible Lavatory with Wheelchair & Galley) -->
+        <div class="lopa-monument-col" style="margin-left: 16px; margin-right: 0;">
+          <div class="lopa-lavatory-box" title="Mid-Cabin Accessible Lavatory (L2)" style="font-size: 16px;">🚻♿</div>
+          <div class="lopa-galley-box" title="Mid-Cabin Service Galley">☕</div>
+          <div class="lopa-lavatory-box" title="Mid-Cabin Lavatory (R2)">🚻</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schematics Legend & Live Status Indicators -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 10px; border-top: 1px solid #E2E8F0; flex-wrap: wrap; gap: 8px;">
+      <div style="display: flex; gap: 14px; font-size: 11px; font-weight: 700; color: #475569; flex-wrap: wrap;">
+        <span style="display:flex; align-items:center; gap:5px;"><span style="width:12px; height:12px; border-radius:3px; background:#0F172A; display:inline-block;"></span> Seated (Boarded)</span>
+        <span style="display:flex; align-items:center; gap:5px;"><span style="width:12px; height:12px; border-radius:3px; background:#10B981; display:inline-block; box-shadow:0 0 6px #10B981;"></span> Service Request (Green)</span>
+        <span style="display:flex; align-items:center; gap:5px;"><span style="width:12px; height:12px; border-radius:3px; background:#F59E0B; display:inline-block; box-shadow:0 0 6px #F59E0B;"></span> Attendant En Route (Amber)</span>
+        <span style="display:flex; align-items:center; gap:5px;"><span style="width:12px; height:12px; border-radius:3px; background:#EF4444; display:inline-block; box-shadow:0 0 8px #EF4444;"></span> Emergency SOS (Red Pulse)</span>
+        <span style="display:flex; align-items:center; gap:5px;"><span style="width:12px; height:12px; border-radius:3px; background:#00A3FF; display:inline-block;"></span> Lavatory / 🚻</span>
+        <span style="display:flex; align-items:center; gap:5px;"><span style="width:12px; height:12px; border-radius:3px; background:#334155; display:inline-block;"></span> Galley / ☕</span>
+      </div>
+      <div style="font-size: 11px; color: #64748B; font-weight: 700;">
+        💡 Click any seat pod for Holographic Inspector HUD & 1-Tap En Route Dispatch
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Holographic Seat Inspector HUD (Pop-up Card) -->
+  <div class="seat-inspector-popup" id="seatInspectorPopup">
+    <div class="inspector-header">
+      <div style="display:flex; align-items:center; gap:6px;">
+        <span class="inspector-seat-badge" id="inspSeatId">24K</span>
+        <span style="font-size:11px; color:#38BDF8; font-weight:800;" id="inspSeatClass">WINDOW SEAT • ZONE B</span>
+      </div>
+      <button class="inspector-close-btn" onclick="closeSeatInspector()">✕</button>
+    </div>
+    <div class="inspector-detail-row" id="inspDetailRow">
+      Passenger Status: Seated (Device Connected)
+    </div>
+    <div class="inspector-actions-row">
+      <button class="btn-inspect-action" id="inspBtnAction" style="background:#10B981; color:white;" onclick="triggerInspectorAction()">
+        ⚡ Respond / En Route
+      </button>
+      <button class="btn-inspect-action" style="background:#334155; color:#F8FAFC;" onclick="focusQueueCard(currentInspectedSeat)">
+        📋 Focus In Queue
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Tablet Landscape Grid: Priority Queue (Left) & Purser Control (Right) -->
+  <div class="tablet-main-grid">
+
+    <!-- Left Pane: Priority Queue Array -->
+    <div class="queue-pane">
+
+      <!-- Pinned Medical Emergency Alert Banner -->
+      <div class="pinned-emergency-card" id="emBannerCard">
+        <div class="pinned-em-title">
+          <span>🚨</span> <span>TOP PRIORITY MEDICAL CALL (最優先・緊急医療対応)</span>
+        </div>
+        <div class="pinned-em-msg" id="emBannerText">
+          Seat 24K reports acute distress! Shifted to Position #1 of Queue Array. Oxygen & First-Aid Standby.
+        </div>
+      </div>
+
+      <!-- Priority Queue Container -->
+      <div class="queue-container">
+        <div class="queue-title-row">
+          <div class="queue-heading-jp">
+            <span>PRIORITY QUEUE ARRAY (要対応リクエスト一覧)</span>
+            <span class="queue-badge-count" id="queueBadgeCount">0 Active</span>
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">Auto-Sorted: Emergency &rarr; Comfort</div>
+        </div>
+
+        <div class="queue-feed-list" id="queueFeedList">
+          <div style="color: #94A3B8; text-align: center; padding: 40px 0;" id="emptyListNotice">
+            No active calls. Waiting for passenger requests...<br>(リクエスト待機中)
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Right Pane: Fast Demonstrator & Purser Operations -->
+    <div class="fast-demo-panel">
+      <div class="demo-heading">⚡ 1-CLICK DEMO CALLS FOR JUDGES (審査員向けデモ):</div>
+      <div class="demo-grid-btns">
+        <button class="demo-tap-box" onclick="simulateCall('24K', 'お水を一杯いただけますでしょうか？', 'Omizu o ippai itadakemasu ka?', 'Drinking water please', 'NORMAL', 'COMFORT')">
+          💧 24K: Drinking Water (Green)
+        </button>
+        <button class="demo-tap-box" onclick="simulateCall('20C', '寒気を感じますので毛布をいただけますか？', 'Samuke o kanjimasu node mōfu o...', 'Warm blanket please', 'NORMAL', 'COMFORT')">
+          🛏️ 20C: Warm Blanket (Green)
+        </button>
+        <button class="demo-tap-box" onclick="simulateCall('21B', '激しい頭痛と胸の苦しみを訴えています！酸素確認要！', 'Hageshii zutsū to mune no kurushimi...', 'Severe chest pain & nausea!', 'HIGH', 'MEDICAL')" style="border-color: #F87171; background: #FEF2F2; color: #991B1B;">
+          🚨 21B: MEDICAL EMERGENCY (Red)
+        </button>
+        <button class="demo-tap-box" onclick="simulateMedicineDecoderCall('24K', 'vertin')" style="border-color: #10B981; background: rgba(16, 185, 129, 0.18); color: #6EE7B7; grid-column: 1 / -1;">
+          💊 Demo: 24K Indian Med (Vertin 16mg ➔ ベタヒスチン)
+        </button>
+        <button class="demo-tap-box" onclick="simulateComplaintCall('24K', 'screen_frozen')" style="border-color: #38BDF8; background: rgba(37, 99, 235, 0.18); color: #93C5FD; grid-column: 1 / -1;">
+          🛠️ Demo: 24K Complaint (Screen Frozen ➔ その場で即時解決)
+        </button>
+        <button class="demo-tap-box" onclick="simulateInstructionCall('20C', 'dnd_meal')" style="border-color: #F59E0B; background: rgba(245, 158, 11, 0.18); color: #FDE68A; grid-column: 1 / -1;">
+          📋 Demo: 20C Instruction (Do Not Disturb for Meal ➔ DND設定)
+        </button>
+        <button class="demo-tap-box" onclick="resetAllDemoSeats()">
+          🔄 Reset All Seats
+        </button>
+      </div>
+
+      <!-- Purser Station Quick Diagnostics Strip -->
+      <div style="margin-top: 16px; padding: 14px; background: rgba(8, 16, 32, 0.85); border: 1px solid var(--hairline-gold); border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.4);">
+        <div style="font-size: 11px; font-weight: 800; color: var(--yamabuki-gold); margin-bottom: 10px; display:flex; align-items:center; gap:6px;">
+          <span>📡</span> <span>PURSER CABIN TELEMETRY (客室環境データ)</span>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px;">
+          <div style="background: rgba(15, 23, 42, 0.7); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--ginzumi-silver); font-size: 9px; font-weight: 700;">WI-FI AP</div>
+            <div style="font-weight: 800; color: #38BDF8;">● JL-Air-LAN (Active)</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--ginzumi-silver); font-size: 9px; font-weight: 700;">CABIN TEMP</div>
+            <div style="font-weight: 800; color: #10B981;">22.4°C (HEPA ON)</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--ginzumi-silver); font-size: 9px; font-weight: 700;">MONITORED SEATS</div>
+            <div style="font-weight: 800; color: var(--yamabuki-gold);">42 Capsules (Zone B)</div>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="color: var(--ginzumi-silver); font-size: 9px; font-weight: 700;">SURVEILLANCE LINK</div>
+            <div style="font-weight: 800; color: #34D399;">● ops.jal (Secure)</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- Cinematic Flight Takeoff & Climb Screen -->
+  <div class="takeoff-overlay-modal" id="takeoffModalOverlay">
+    <button class="takeoff-dismiss-btn" onclick="closeTakeoffAnimation()">✕ Skip Animation</button>
+    <div class="stars-layer"></div>
+    <div class="clouds-passing"></div>
+
+    <!-- Header Box with Boarding Done Badge -->
+    <div class="takeoff-header-box">
+      <div class="boarding-done-pill">
+        <span>✓</span> <span>BOARDING DONE (搭乗完了) • ALL 42 SEATED</span>
+      </div>
+      <div class="takeoff-title-main">FLIGHT JL 740 TAKING OFF</div>
+      <div class="takeoff-sub-meta">Boeing 787-9 Dreamliner • Delhi (DEL) &rarr; Tokyo Haneda (HND)</div>
+    </div>
+
+    <!-- Center Stage: Perspective 3D Runway & Boeing 787 Vector Jet -->
+    <div class="flight-stage-center">
+      <!-- Perspective 3D Runway -->
+      <div class="runway-perspective-box">
+        <div class="runway-center-stripes"></div>
+      </div>
+
+      <!-- Scalable High-Fidelity SVG Dreamliner Aircraft Silhouette -->
+      <div class="dreamliner-jet-craft">
+        <div class="jet-exhaust-left"></div>
+        <div class="jet-exhaust-right"></div>
+        <div class="wing-strobe-port"></div>
+        <div class="wing-strobe-stbd"></div>
+
+        <!-- Authentic Boeing 787 Aerodynamic Vector Geometry -->
+        <svg width="200" height="190" viewBox="0 0 200 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Main Wing Swept Silhouette -->
+          <path d="M100 50 L195 110 C185 114 170 115 155 113 L110 88 L108 150 L140 172 L132 176 L100 165 L68 176 L60 172 L92 150 L90 88 L45 113 C30 115 15 114 5 110 L100 50 Z" fill="#E2E8F0" stroke="#94A3B8" stroke-width="1.5"/>
+          <!-- Jet Engine Pods Under Wings -->
+          <ellipse cx="78" cy="85" rx="6" ry="16" fill="#1E293B" stroke="#00A3FF" stroke-width="1.5"/>
+          <ellipse cx="122" cy="85" rx="6" ry="16" fill="#1E293B" stroke="#00A3FF" stroke-width="1.5"/>
+          <!-- Main Fuselage Body -->
+          <path d="M93 18 C93 8 107 8 107 18 L108 165 C108 170 92 170 92 165 Z" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+          <!-- Cockpit Glass Windshield Visor -->
+          <path d="M96 22 C96 16 104 16 104 22 L105 28 L95 28 Z" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+          <!-- Red JAL Tsurumaru Crest on Vertical Stabilizer -->
+          <circle cx="100" cy="158" r="4.5" fill="#C8102E"/>
+          <circle cx="100" cy="158" r="3.2" fill="#FFFFFF"/>
+          <circle cx="100" cy="158" r="2" fill="#C8102E"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Glass Cockpit HUD & Telemetry Data -->
+    <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+      <div class="avionics-pfd-hud">
+        <div class="hud-block">
+          <span class="hud-label">AIRSPEED (IAS)</span>
+          <span class="hud-digit-cyan" id="pfdSpeed">80 KTS</span>
+        </div>
+        <div class="hud-block">
+          <span class="hud-label">PITCH / STATUS</span>
+          <span class="hud-digit-green" id="pfdPitch">ROTATE (VR)</span>
+        </div>
+        <div class="hud-block">
+          <span class="hud-label">ALTITUDE</span>
+          <span class="hud-digit-gold" id="pfdAltitude">0 FT</span>
+        </div>
+        <div class="hud-block">
+          <span class="hud-label">THRUST N1</span>
+          <span class="hud-digit-cyan" id="pfdThrust">TOGA 98.4%</span>
+        </div>
+      </div>
+      <div class="flight-phase-ticker" id="takeoffPhaseTicker">
+        🛫 RUNWAY 28 TAKEOFF ROLL • V1 ROTATE (滑走開始)
+      </div>
+    </div>
+  </div><script>
+    const wsProto = location.protocol === "https:" ? "wss:" : "ws:";
+    let ws = null;
+    let priorityQueue = []; // Explicit Priority Queue Array
+    const allSeats = [];
+    const rows = [20, 21, 22, 23, 24, 25, 26];
+
+    // Build Fuselage Schematic Rows (Rows 20-26, Columns A,B,C | D,E,K in aeroLOPA format)
+    function buildSchematic() {
+      const grid = document.getElementById("lopaRowsGrid");
+      if (!grid) return;
+      grid.innerHTML = "";
+      allSeats.length = 0;
+
+      rows.forEach(r => {
+        const colDiv = document.createElement("div");
+        colDiv.className = "lopa-seat-row-col";
+
+        // Top 3: A, B, C
+        const topWrap = document.createElement("div");
+        topWrap.className = "lopa-cluster-wrap";
+        ['A', 'B', 'C'].forEach(c => {
+          const sId = `${r}${c}`;
+          allSeats.push(sId);
+          topWrap.appendChild(createLopaSeatUnit(sId));
+        });
+        colDiv.appendChild(topWrap);
+
+        // Center Aisle with Row Number
+        const marker = document.createElement("div");
+        marker.className = "lopa-aisle-marker";
+        marker.innerText = r;
+        colDiv.appendChild(marker);
+
+        // Bottom 3: D, E, K
+        const btmWrap = document.createElement("div");
+        btmWrap.className = "lopa-cluster-wrap";
+        ['D', 'E', 'K'].forEach(c => {
+          const sId = `${r}${c}`;
+          allSeats.push(sId);
+          btmWrap.appendChild(createLopaSeatUnit(sId));
+        });
+        colDiv.appendChild(btmWrap);
+
+        grid.appendChild(colDiv);
+      });
+    }
+
+    function createLopaSeatUnit(sId) {
+      const el = document.createElement("div");
+      el.className = "lopa-seat-unit tablet-seat";
+      el.id = `tab-seat-${sId}`;
+      el.title = `Seat ${sId} • Click for Holographic Inspector`;
+
+      const cushion = document.createElement("div");
+      cushion.className = "lopa-cushion";
+
+      const label = document.createElement("span");
+      label.className = "lopa-label";
+      label.innerText = sId;
+
+      el.appendChild(cushion);
+      el.appendChild(label);
+
+      el.onclick = () => {
+        playAvionicsBlip();
+        openSeatInspector(sId);
+        focusQueueCard(sId);
+      };
+      return el;
+    }
+
+    function createTabletSeat(sId) {
+      return createLopaSeatUnit(sId);
+    }
+
+    function openSeatInspector(sId) {
+      currentInspectedSeat = sId;
+      const popup = document.getElementById("seatInspectorPopup");
+      if (!popup) return;
+      
+      const badge = document.getElementById("inspSeatId");
+      const classTag = document.getElementById("inspSeatClass");
+      const detail = document.getElementById("inspDetailRow");
+      const btnAction = document.getElementById("inspBtnAction");
+
+      const col = sId.slice(-1);
+      const isWindow = (col === 'A' || col === 'K');
+      const isAisle = (col === 'C' || col === 'D');
+      const seatType = isWindow ? "WINDOW SEAT" : (isAisle ? "AISLE SEAT" : "MIDDLE SEAT");
+
+      badge.innerText = sId;
+      classTag.innerText = `${seatType} • ZONE B`;
+
+      // Find if seat has an active request in priorityQueue
+      const activeReq = priorityQueue.find(q => q.seat === sId);
+      if (activeReq) {
+        const isEm = activeReq.priority === "HIGH" || activeReq.category === "MEDICAL";
+        if (isEm) {
+          detail.innerHTML = `<span style="color:#EF4444; font-weight:800;">🚨 EMERGENCY SOS ACTIVE</span><br>Distress: "${activeReq.original_text || activeReq.english_text}"<br><em style="color:#FCA5A5;">Priority 0 • Purser / First-Aid Dispatched</em>`;
+          btnAction.style.background = "#EF4444";
+          btnAction.innerText = "🚨 Urgent Respond (En Route)";
+        } else if (activeReq.status === "RESOLVING") {
+          detail.innerHTML = `<span style="color:#F59E0B; font-weight:800;">🟡 IN PROGRESS / EN ROUTE</span><br>Attending Call: "${activeReq.original_text || activeReq.english_text}"`;
+          btnAction.style.background = "#F59E0B";
+          btnAction.innerText = "✓ Mark Delivered";
+        } else {
+          detail.innerHTML = `<span style="color:#10B981; font-weight:800;">🟢 ACTIVE SERVICE CALL</span><br>Request: "${activeReq.original_text || activeReq.english_text}"`;
+          btnAction.style.background = "#10B981";
+          btnAction.innerText = "⚡ Respond / En Route";
+        }
+      } else {
+        const isBoarded = document.getElementById(`tab-seat-${sId}`)?.classList.contains("boarded");
+        detail.innerHTML = `Status: <strong>${isBoarded ? '● Passenger Seated (Cruising)' : '○ Available / Idle'}</strong><br>Wi-Fi Signal: <span style="color:#38BDF8;">● JL-Air-LAN (100% Signal)</span><br>Seatbelt Sensor: <span style="color:#10B981;">Fastened ✓</span>`;
+        btnAction.style.background = "#2563EB";
+        btnAction.innerText = "✓ Normal (No Active Calls)";
+        btnAction.style.background = "#334155";
+      }
+
+      popup.style.display = "block";
+    }
+
+    function closeSeatInspector() {
+      const popup = document.getElementById("seatInspectorPopup");
+      if (popup) popup.style.display = "none";
+    }
+
+    function triggerInspectorAction() {
+      if (!currentInspectedSeat) return;
+      const activeReq = priorityQueue.find(q => q.seat === currentInspectedSeat);
+      if (activeReq) {
+        if (activeReq.status === "RESOLVING") {
+          markDeliveredTablet(currentInspectedSeat, activeReq.request_id);
+        } else {
+          startResolvingTablet(currentInspectedSeat, activeReq.request_id);
+        }
+      } else {
+        // No auto-complaint raised
+        closeSeatInspector();
+      }
+      closeSeatInspector();
+    }
+
+    function playAvionicsBlip() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(1320, ctx.currentTime + 0.08);
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      } catch(e) {}
+    }
+
+    // Boarding Simulation (12 seconds)
+    let boardedTotal = 0;
+    let boardTimer = null;
+    let altTimer = null;
+    let takeoffTimeout = null;
+
+    function runBoardingSequence() {
+      const total = allSeats.length; // 42 seats
+      const delay = (12 * 1000) / total; // ~280ms per passenger
+
+      boardTimer = setInterval(() => {
+        if (boardedTotal < total) {
+          const sId = allSeats[boardedTotal];
+          const el = document.getElementById(`tab-seat-${sId}`);
+          if (el) el.classList.add("boarded");
+          boardedTotal++;
+
+          const pct = Math.round((boardedTotal / total) * 100);
+          document.getElementById("tabletBoardFill").style.width = `${pct}%`;
+          document.getElementById("boardProgressLabel").innerText = `Boarding: ${boardedTotal} / ${total} (${pct}%)`;
+        } else {
+          clearInterval(boardTimer);
+          markBoardingComplete();
+          launchTakeoffSequence();
+        }
+      }, delay);
+    }
+
+    function markBoardingComplete() {
+      document.getElementById("tabletBoardFill").style.width = "100%";
+      document.getElementById("boardProgressLabel").innerHTML = "<strong style='color:#10B981;'>✓ BOARDING DONE (42/42)</strong>";
+      const status = document.getElementById("tabletPhaseStatus");
+      if (status) {
+        status.innerText = "Boarding Done • Cabin Doors Armed (搭乗完了)";
+        status.style.color = "#10B981";
+      }
+    }
+
+    function skipToTakeoffNow() {
+      if (boardTimer) clearInterval(boardTimer);
+      allSeats.forEach(s => {
+        const el = document.getElementById(`tab-seat-${s}`);
+        if (el) el.classList.add("boarded");
+      });
+      markBoardingComplete();
+      launchTakeoffSequence();
+    }
+
+    function launchTakeoffSequence() {
+      playTakeoffChime();
+      const modal = document.getElementById("takeoffModalOverlay");
+      if (!modal) return;
+      modal.style.display = "flex";
+
+      let alt = 0;
+      let spd = 80;
+
+      const altEl = document.getElementById("pfdAltitude");
+      const spdEl = document.getElementById("pfdSpeed");
+      const pitchEl = document.getElementById("pfdPitch");
+      const thrustEl = document.getElementById("pfdThrust");
+      const tickerEl = document.getElementById("takeoffPhaseTicker");
+
+      if (altTimer) clearInterval(altTimer);
+      altTimer = setInterval(() => {
+        alt += 2400;
+        if (spd < 320) spd += 18;
+
+        if (alt >= 35000) {
+          alt = 35000;
+          spd = 320;
+          clearInterval(altTimer);
+          if (pitchEl) { pitchEl.innerText = "LEVEL CRUISE"; pitchEl.style.color = "#34D399"; }
+          if (thrustEl) { thrustEl.innerText = "CLB 88.0%"; }
+          if (tickerEl) { tickerEl.innerHTML = "✓ REACHED FL350 • CABIN SERVICE ACTIVATED (巡航高度到達・サービス開始)"; }
+        } else if (alt >= 18000) {
+          if (pitchEl) { pitchEl.innerText = "+10° CLIMB"; }
+          if (tickerEl) { tickerEl.innerHTML = "🛫 PASSING 18,000 FT • STRATOSPHERE ASCENT (成層圏上昇中)"; }
+        } else if (alt >= 5000) {
+          if (pitchEl) { pitchEl.innerText = "+15° CLIMB"; }
+          if (tickerEl) { tickerEl.innerHTML = "🛫 POSITIVE RATE OF CLIMB • GEAR RETRACTED (上昇・車輪格納)"; }
+        }
+
+        if (altEl) altEl.innerText = `${alt.toLocaleString()} FT`;
+        if (spdEl) spdEl.innerText = `${spd} KTS`;
+      }, 240);
+
+      if (takeoffTimeout) clearTimeout(takeoffTimeout);
+      takeoffTimeout = setTimeout(() => {
+        closeTakeoffAnimation();
+      }, 4800);
+    }
+
+    function closeTakeoffAnimation() {
+      if (altTimer) clearInterval(altTimer);
+      if (takeoffTimeout) clearTimeout(takeoffTimeout);
+      const modal = document.getElementById("takeoffModalOverlay");
+      if (modal) modal.style.display = "none";
+
+      const phase = document.getElementById("tabletPhaseStatus");
+      if (phase) {
+        phase.innerText = "Cruising at 35,000 ft (巡航中・サービス開始)";
+        phase.style.color = "#10B981";
+      }
+      playChime();
+    }
+
+    // Connect WebSocket
+    function connectCrewTabletSocket() {
+      ws = new WebSocket(`${wsProto}//${location.host}/ws/crew`);
+
+      ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log("Crew WS Event:", data);
+
+        if (data.type === "new_alert" || data.type === "incoming_request") {
+          enqueueRequest(data);
+        } else if (data.type === "passenger_mark_resolved") {
+          if (data.seat === "ALL") {
+            resetAllDemoSeats();
+          } else {
+            dequeueRequest(data.seat);
+          }
+        }
+      };
+
+      ws.onclose = function() {
+        setTimeout(connectCrewTabletSocket, 2000);
+      };
+    }
+
+    // Add Request to Priority Queue Array (Medical Emergenices go to Index 0)
+    function enqueueRequest(req) {
+      playChime();
+
+      // Remove existing from same seat
+      priorityQueue = priorityQueue.filter(q => q.seat !== req.seat);
+
+      const isEmergency = req.priority === "HIGH" || req.category === "MEDICAL";
+      if (isEmergency) {
+        priorityQueue.unshift(req); // Pinned to Position #1
+        setTabletSeatColor(req.seat, "alert-red");
+        showEmergencyBanner(req);
+        playEmergencyAlarm();
+      } else {
+        // Insert after existing emergencies
+        const firstNormalIdx = priorityQueue.findIndex(q => q.priority !== "HIGH" && q.category !== "MEDICAL");
+        if (firstNormalIdx === -1) {
+          priorityQueue.push(req);
+        } else {
+          priorityQueue.splice(firstNormalIdx, 0, req);
+        }
+        setTabletSeatColor(req.seat, "call-green");
+      }
+
+      renderQueueView();
+    }
+
+    function setTabletSeatColor(seatId, stateClass) {
+      const el = document.getElementById(`tab-seat-${seatId}`);
+      if (el) {
+        el.classList.remove("call-green", "resolving-amber", "alert-red");
+        if (stateClass) el.classList.add(stateClass);
+      }
+    }
+
+    function renderQueueView() {
+      const list = document.getElementById("queueFeedList");
+      const emptyNotice = document.getElementById("emptyListNotice");
+      const badge = document.getElementById("queueBadgeCount");
+
+      badge.innerText = `${priorityQueue.length} Active`;
+
+      if (priorityQueue.length === 0) {
+        list.innerHTML = "";
+        list.appendChild(emptyNotice);
+        emptyNotice.style.display = "block";
+        document.getElementById("emBannerCard").style.display = "none";
+        return;
+      }
+
+      emptyNotice.style.display = "none";
+      list.innerHTML = "";
+
+      priorityQueue.forEach((req, idx) => {
+        const isEm = req.priority === "HIGH" || req.category === "MEDICAL";
+        const isResolving = req.status === "RESOLVING";
+        const cardClass = isEm ? "HIGH" : (isResolving ? "RESOLVING" : "NORMAL");
+
+        const card = document.createElement("div");
+        card.className = `q-request-item ${cardClass}`;
+        card.id = `qcard-${req.seat}`;
+
+        card.innerHTML = `
+          <div class="q-item-top">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="seat-badge-box">SEAT ${req.seat}</span>
+              <span class="q-index-pill">Queue #${idx + 1}</span>
+            </div>
+            <span class="priority-badge-pill ${cardClass}">
+              ${isEm ? '🚨 EMERGENCY [TOP PRIORITY]' : (isResolving ? '● IN PROGRESS' : '● NORMAL SERVICE')}
+            </span>
+          </div>
+
+          <!-- High-Visibility Custom Passenger Speech / Text Banner -->
+          <div class="passenger-custom-speech-highlight" style="background:linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(15, 23, 42, 0.95) 100%); border:1.5px solid #F59E0B; border-radius:10px; padding:10px 14px; margin:8px 0; box-shadow:0 4px 12px rgba(245, 158, 11, 0.15);">
+            <div style="font-size:10px; font-weight:800; color:#FBBF24; letter-spacing:0.5px; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+              <span>💬</span> <span>乗客からの直接メッセージ (PASSENGER CUSTOM REQUEST):</span>
+            </div>
+            <div style="font-size:15px; font-weight:800; color:#FFFFFF; margin-top:4px; line-height:1.4;">
+              "${req.original_text || req.english_text || req.title || ''}"
+            </div>
+          </div>
+
+          <div class="keigo-phrase-jp">${req.translated_ja || 'お伺いいたします。'}</div>
+          <div class="romaji-reading-sub">${req.romaji || ''}</div>
+          ${renderCrewMedDossier(req)}
+          ${renderCrewComplaintActions(req)}
+          <div class="passenger-sanitized-speech">
+            <strong>Original Transcript:</strong> "${req.original_text || req.english_text || ''}"
+          </div>
+
+          <div class="q-btn-group">
+            <button class="btn-tablet-action btn-tts" onclick="speakJapaneseKeigo('${req.translated_ja || ''}')">
+              🔊 読み上げ (Hear JA)
+            </button>
+            <button class="btn-tablet-action btn-resolving" onclick="startResolvingTablet('${req.seat}', '${req.request_id || ''}')">
+              ⏳ 対応開始 (Start Resolving)
+            </button>
+            <button class="btn-tablet-action btn-delivered" onclick="markDeliveredTablet('${req.seat}', '${req.request_id || ''}')">
+              ✓ 提供完了 (Deliver to Seat)
+            </button>
+          </div>
+          <div class="crew-2way-reply-toolbar" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);">
+            <button class="btn-res-action" style="background:rgba(56,189,248,0.15); border-color:#38BDF8; font-size:11px;" onclick="sendCrewDirectReply('${req.seat}', 'かしこまりました。ただいまお持ちいたします。', 'Certainly. Bringing this to your seat immediately.')">💬 「ただいまお持ちします」</button>
+            <button class="btn-res-action" style="background:rgba(56,189,248,0.15); border-color:#38BDF8; font-size:11px;" onclick="sendCrewDirectReply('${req.seat}', '恐れ入ります、少々お待ちいただけますでしょうか。', 'Excuse me, could you please wait just a moment.')">⏳ 「少々お待ちください」</button>
+            <button class="btn-res-action" style="background:rgba(56,189,248,0.15); border-color:#38BDF8; font-size:11px;" onclick="promptCrewCustomReply('${req.seat}')">✍️ 自由返答 (Custom Reply)</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    // Crew Action: Start Resolving
+    function startResolvingTablet(seat, reqId) {
+      setTabletSeatColor(seat, "resolving-amber");
+      const item = priorityQueue.find(q => q.seat === seat);
+      if (item) item.status = "RESOLVING";
+
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: "crew_reply",
+          seat: seat,
+          request_id: reqId,
+          reply_ja: "ただいま担当乗務員が向かっております",
+          reply_hi: "केबिन क्रू आपकी सीट की तरफ आ रहा है"
+        }));
+      }
+      renderQueueView();
+    }
+
+    // Crew Action: Mark Delivered (prompts passenger)
+    function markDeliveredTablet(seat, reqId) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: "crew_delivered",
+          seat: seat,
+          request_id: reqId
+        }));
+      }
+      alert(`Delivered to Seat ${seat}! Passenger will confirm resolution.`);
+    }
+
+    // Dequeue upon resolution
+    function dequeueRequest(seat) {
+      priorityQueue = priorityQueue.filter(q => q.seat !== seat);
+      setTabletSeatColor(seat, null);
+      renderQueueView();
+      if (!priorityQueue.some(q => q.priority === "HIGH" || q.category === "MEDICAL")) {
+        document.getElementById("emBannerCard").style.display = "none";
+      }
+    }
+
+    function showEmergencyBanner(req) {
+      const banner = document.getElementById("emBannerCard");
+      banner.style.display = "block";
+      document.getElementById("emBannerText").innerText = 
+        `🚨 EMERGENCY at Seat ${req.seat}: "${req.original_text || req.english_text}". Pinned at Position #1! Standby First-Aid Kit.`;
+    }
+
+    function focusQueueCard(sId) {
+      const card = document.getElementById(`qcard-${sId}`);
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.style.transform = "scale(1.02)";
+        setTimeout(() => { card.style.transform = "scale(1)"; }, 350);
+      }
+    }
+
+    // Fast Demo Calls
+    function simulateCall(seat, ja, romaji, orig, priority, cat) {
+      enqueueRequest({
+        seat: seat,
+        request_id: `DEMO-${seat}-${Date.now()}`,
+        translated_ja: ja,
+        romaji: romaji,
+        original_text: orig,
+        priority: priority,
+        category: cat,
+        status: "PENDING"
+      });
+    }
+
+    function resetAllDemoSeats() {
+      priorityQueue = [];
+      allSeats.forEach(s => setTabletSeatColor(s, null));
+      renderQueueView();
+      document.getElementById("emBannerCard").style.display = "none";
+    }
+
+    // Sound Synthesizers (Web Audio API - 100% Offline)
+    function playChime() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc.frequency.setValueAtTime(880, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+      } catch(e) {}
+    }
+
+    function playEmergencyAlarm() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        [0, 0.2, 0.4].forEach((delay, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(idx % 2 === 0 ? 880 : 1174, ctx.currentTime + delay);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + delay + 0.18);
+          osc.start(ctx.currentTime + delay);
+          osc.stop(ctx.currentTime + delay + 0.18);
+        });
+      } catch(e) {}
+    }
+
+    function playTakeoffChime() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.2);
+        osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.4);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.8);
+      } catch(e) {}
+    }
+
+    function speakJapaneseKeigo(text) {
+      if ('speechSynthesis' in window) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'ja-JP';
+        window.speechSynthesis.speak(u);
+      }
+    }
+
+    // Cabin Mood Lighting Atmosphere Switcher (Dynamic Living Feature)
+    function setMoodAtmosphere(mood) {
+      const hull = document.getElementById("lopaFuselageHull");
+      const btns = {
+        sakura: document.getElementById("moodBtnSakura"),
+        indigo: document.getElementById("moodBtnIndigo"),
+        zen: document.getElementById("moodBtnZen")
+      };
+
+      Object.values(btns).forEach(b => { if (b) b.classList.remove("active"); });
+      if (btns[mood]) btns[mood].classList.add("active");
+
+      if (!hull) return;
+
+      if (mood === "sakura") {
+        hull.style.background = "radial-gradient(circle at 50% 50%, #2A1728 0%, #1A1122 80%, #110B18 100%)";
+        hull.style.boxShadow = "0 0 35px rgba(244, 63, 94, 0.25), inset 0 2px 14px rgba(0,0,0,0.6)";
+      } else if (mood === "indigo") {
+        hull.style.background = "radial-gradient(circle at 50% 50%, #152744 0%, #0F1D33 80%, #0B1626 100%)";
+        hull.style.boxShadow = "0 0 35px rgba(0, 163, 255, 0.25), inset 0 2px 14px rgba(0,0,0,0.6)";
+      } else if (mood === "zen") {
+        hull.style.background = "radial-gradient(circle at 50% 50%, #132822 0%, #0E1D18 80%, #091310 100%)";
+        hull.style.boxShadow = "0 0 35px rgba(16, 185, 129, 0.25), inset 0 2px 14px rgba(0,0,0,0.6)";
+      }
+      playAvionicsBlip();
+    }
+
+    // Init
+    buildSchematic();
+    runBoardingSequence();
+    connectCrewTabletSocket();
+  
+    // Indian Medicine Dossier Renderer for Crew Tablet
+    function renderCrewMedDossier(req) {
+      if (!req.med_details) return '';
+      const m = req.med_details;
+      return `
+        <div class="crew-med-dossier-box">
+          <div class="crew-med-header">
+            <span class="crew-med-pill">💊 携行薬デコーダー (PHARMA DECODER)</span>
+            <span class="crew-med-origin">インド商標名 ➔ 厚労省標準薬</span>
+          </div>
+          <div class="crew-med-grid">
+            <div class="crew-med-col">
+              <div class="crew-label">乗客携行ブランド (Indian Brand):</div>
+              <div class="crew-val brand-val">${m.brand || 'Unknown'}</div>
+              <div class="crew-sub">${m.dosage || ''} ${m.mfg ? '· ' + m.mfg : ''}</div>
+            </div>
+            <div class="crew-med-col">
+              <div class="crew-label">国際一般名 (INN) / 日本標準薬名:</div>
+              <div class="crew-val inn-val">${m.inn || ''}</div>
+              <div class="crew-val jp-val">🇯🇵 ${m.ja_name || ''}</div>
+            </div>
+          </div>
+          <div class="crew-med-purpose">
+            <strong>📋 臨床効能・分類:</strong> ${m.purpose_ja || m.purpose || ''}
+          </div>
+          <div class="crew-med-advisory">
+            <strong>✈️ 機内対応指示:</strong> ${m.advisory_ja || m.advisory || '白湯の提供、リクライニング調整、見守り'}
+          </div>
+        </div>
+      `;
+    }
+
+    // 1-Click Simulation of Indian Medicine Triage for Judges
+    function simulateMedicineDecoderCall(seat, medType) {
+      const demoReq = {
+        type: "new_alert",
+        request_id: `DEMO-MED-${seat}`,
+        seat: seat,
+        category: "MEDICAL",
+        priority: "HIGH",
+        original_text: "Passenger carrying Indian blister pack: Vertin 16mg (Abbott India) for severe dizziness & vertigo.",
+        english_text: "Carrying Indian Medicine: Vertin 16mg (Betahistine)",
+        translated_ja: "【乗客携行薬】Vertin 16mg → ベタヒスチン塩酸塩（メリスロン）。白湯の提供とめまい見守りが必要です。",
+        romaji: "Betahisuchin ensanen (Memai chiryōyaku). Sayu o teikyō shite kudasai.",
+        icon: "💊",
+        med_details: {
+          brand: "Vertin 16mg",
+          dosage: "Tablet (16mg)",
+          mfg: "Abbott Healthcare India",
+          inn: "Betahistine Dihydrochloride",
+          ja_name: "ベタヒスチン塩酸塩 (メリスロン錠)",
+          purpose: "Anti-vertigo, inner-ear microcirculation, Meniere's disease",
+          purpose_ja: "めまい治療薬・内耳循環改善薬・メニエール病",
+          advisory_ja: "降下時・気圧変化時に内耳リンパの乱れによるめまいが悪化しやすくなります。白湯を十分に提供し、頭部をヘッドレストに固定するようご案内ください。"
+        }
+      };
+
+      enqueueRequest(demoReq);
+    }
+
+  
+    // Renders instant 1-tap resolution actions for complaints and instructions
+    function renderCrewComplaintActions(req) {
+      const isComp = req.category === "COMPLAINT";
+      const isInst = req.category === "INSTRUCTION";
+      if (!isComp && !isInst) return '';
+
+      if (isComp) {
+        return `
+          <div style="background:rgba(37,99,235,0.12); border:1px solid rgba(37,99,235,0.4); border-radius:8px; padding:8px 10px; margin:8px 0;">
+            <div style="font-size:10px; font-weight:800; color:#93C5FD; margin-bottom:6px;">🛠️ その場で即時解決アクション (INSTANT CREW RESOLUTION):</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Screen Remote Reboot Triggered & Confirmed Normal', '座席モニターの遠隔再起動を実施し、正常動作を確認いたしました。')">🔄 IFE画面再起動</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Replacement Headphones Delivered to Seat', '新品ステレオヘッドホンをお届けし、音声出力を確認いたしました。')">🎧 新品ヘッドホン交換</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Seat Recline Mechanism Inspected & Unlocked', '座席リクライニング機構を点検し、正常に解除いたしました。')">💺 座席機構点検</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Cabin Zone Temperature Adjusted +1°C & Warm Blanket Provided', '空調ゾーン温度を+1℃調整し、保温用毛布をお持ちいたしました。')">🌡️ 空調調整・毛布</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Meal Warmed & Re-Served with Refreshment', '温かいお食事を再配膳し、お飲み物をお持ちいたしました。')">🍱 食事温め直し</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Attendant Visited Seat & Resolved Concern', '客室乗務員が座席にてご案内し、ご要望を解決いたしました。')">✓ その場で解決完了</button>
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div style="background:rgba(245,158,11,0.12); border:1px solid rgba(245,158,11,0.4); border-radius:8px; padding:8px 10px; margin:8px 0;">
+            <div style="font-size:10px; font-weight:800; color:#FDE68A; margin-bottom:6px;">📋 ご要望対応アクション (INSTRUCTION CONFIRMATION):</div>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;">
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Do Not Disturb Tag Activated - Will Not Wake for Meal', 'お休みのため、お食事時の声かけ不要フラグを設定いたしました。')">😴 DNDフラグ設定</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Wake-Up Call Set for 45 Mins Before Haneda Descent', '羽田降下の45分前にお声かけするスケジュールを登録いたしました。')">⏰ 着陸前目覚まし登録</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Airport Wheelchair Requested at Tokyo Haneda Gate', '東京羽田空港ゲートへの車いす手配を地上管制へ打電いたしました。')">♿ 車いす地上打電完了</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Customs Form & Pen Delivered to Seat', '入国申告書およびペンをお席にお届けいたしました。')">🖊️ 入国書類お届け完了</button>
+              <button class="btn-res-action" onclick="resolveIssueImmediatelyTablet('${req.seat}', '${req.ticket_id || req.request_id || ''}', 'Warm Water for Infant Bottle Prepared & Delivered', '適温の調乳用白湯をご用意し、お届けいたしました。')">🍼 調乳白湯お届け完了</button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Resolves issue immediately at seat and broadcasts closed-loop resolution to passenger
+    function resolveIssueImmediatelyTablet(seat, ticketId, actionText, actionTextJa) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          type: "issue_resolved_by_crew",
+          seat: seat,
+          ticket_id: ticketId,
+          action_taken: actionText,
+          action_taken_ja: actionTextJa,
+          crew_name: "Yukiko Tanaka (田中 ゆきこ)"
+        }));
+      }
+
+      dequeueRequest(seat);
+      alert(`✅ Seat ${seat} Issue Resolved at Seat!
+
+Action: ${actionText}
+
+Live resolution certificate delivered to passenger.`);
+    }
+
+    // Simulation for Judges: Complaint
+    function simulateComplaintCall(seat, issueKey) {
+      const demoReq = {
+        type: "new_alert",
+        request_id: `CMP-${seat}-DEMO`,
+        ticket_id: `CMP-${seat}-DEMO`,
+        seat: seat,
+        category: "COMPLAINT",
+        priority: "HIGH",
+        original_text: "Passenger reports IFE monitor completely frozen, touch unresponsive, cannot watch safety demo or movies.",
+        english_text: "IFE Screen Frozen & Touch Unresponsive",
+        translated_ja: "【座席不具合】座席24Kの画面（IFEモニター）がフリーズし操作不能です。遠隔再起動または席での点検が必要です。",
+        romaji: "Zaseki monitaa ga furiizu shite orimasu. Enkaku saikidō yō.",
+        icon: "📺",
+        issue_type: "screen_frozen"
+      };
+
+      enqueueRequest(demoReq);
+    }
+
+    // Simulation for Judges: Instruction
+    function simulateInstructionCall(seat, instKey) {
+      const demoReq = {
+        type: "new_alert",
+        request_id: `INST-${seat}-DEMO`,
+        ticket_id: `INST-${seat}-DEMO`,
+        seat: seat,
+        category: "INSTRUCTION",
+        priority: "NORMAL",
+        original_text: "Passenger requested: Please do not wake me up for dinner service, want to sleep until Tokyo descent.",
+        english_text: "Do Not Disturb for Meal / Sleep",
+        translated_ja: "【特別ご要望】睡眠中のため、お食事サービス時の声かけ不要（起こさないでください）とのご要望です。",
+        romaji: "Suimin-chū no tame, oshokuji-ji okosanaide kudasai to no go-yōbō.",
+        icon: "😴",
+        issue_type: "dnd_meal"
+      };
+
+      enqueueRequest(demoReq);
+    }
+
+  </script>
+
+</body>
+</html>

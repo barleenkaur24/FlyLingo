@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Japan Airlines — Electronic Boarding Pass (JL740) • STEP 1</title>
+  <style>
+    :root {
+      --jal-kurenai: #BA0C2F;
+      --jal-kurenai-dark: #8A001E;
+      --sumi-black: #0A1118;
+      --washi-cream: #F9F8F5;
+      --card-white: #FFFFFF;
+      --tatami-border: #E8E5DF;
+      --slate-text: #1E293B;
+      --muted-gray: #64748B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; }
+    
+    body {
+      background: #EDEAE4;
+      background-image: radial-gradient(#D8D4CC 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--slate-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    /* Systematic Lifecycle Stepper (Locked/Linear) */
+    .lifecycle-stepper {
+      width: 100%;
+      max-width: 860px;
+      background: var(--card-white);
+      border-radius: 30px;
+      border: 1px solid var(--tatami-border);
+      padding: 8px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 14px rgba(10,17,24,0.04);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-pill {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted-gray);
+      padding: 6px 12px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .step-pill.current {
+      background: var(--jal-kurenai);
+      color: white;
+    }
+    .step-pill.locked {
+      opacity: 0.5;
+    }
+    .step-div { color: #CBD5E1; font-size: 10px; }
+
+    /* Dual Monitor Instruction Bar for Judges */
+    .laptop-phone-pairing-banner {
+      width: 100%;
+      max-width: 860px;
+      background: #EFF6FF;
+      border: 1.5px solid #93C5FD;
+      border-radius: 14px;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.05);
+    }
+    .pair-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .pair-icon { font-size: 28px; }
+    .pair-title { font-size: 13px; font-weight: 800; color: #1E40AF; }
+    .pair-sub { font-size: 11px; color: #3B82F6; }
+    .btn-open-crew-laptop {
+      background: #1E40AF;
+      color: white;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 8px 16px;
+      border-radius: 8px;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .btn-open-crew-laptop:hover {
+      background: #1D4ED8;
+    }
+
+    /* JAL Boarding Pass Card */
+    .boarding-card {
+      max-width: 860px;
+      width: 100%;
+      background: var(--card-white);
+      border-radius: 20px;
+      box-shadow: 0 20px 48px rgba(10, 17, 24, 0.1);
+      border: 1px solid var(--tatami-border);
+      overflow: hidden;
+    }
+
+    /* Top Red Crane Header */
+    .card-top-banner {
+      background: var(--sumi-black);
+      color: white;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid var(--jal-kurenai);
+    }
+    .brand-cluster {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .tsuru-crest {
+      width: 40px;
+      height: 40px;
+      background: var(--jal-kurenai);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 20px;
+      box-shadow: 0 4px 10px rgba(186, 12, 47, 0.4);
+    }
+    .brand-text-jp {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+    .brand-sub-en {
+      font-size: 11px;
+      color: #94A3B8;
+      letter-spacing: 0.5px;
+    }
+    .flight-capsule {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    /* Route Graphic Bar */
+    .flight-route-bar {
+      background: #FDFBF8;
+      padding: 24px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed var(--tatami-border);
+    }
+    .airport-block {
+      display: flex;
+      flex-direction: column;
+    }
+    .iata-code {
+      font-size: 40px;
+      font-weight: 900;
+      color: var(--sumi-black);
+      line-height: 1;
+    }
+    .airport-full {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted-gray);
+      margin-top: 4px;
+    }
+    .route-mid-visual {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .route-path-line {
+      width: 160px;
+      height: 2px;
+      background: #CBD5E1;
+      position: relative;
+    }
+    .airplane-glyph {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 18px;
+    }
+
+    /* Pass Details & Offline QR Split */
+    .pass-details-split {
+      padding: 32px;
+      display: grid;
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 32px;
+    }
+    .passenger-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 24px;
+    }
+    .meta-cell {
+      display: flex;
+      flex-direction: column;
+    }
+    .meta-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 4px;
+    }
+    .meta-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--slate-text);
+    }
+    .seat-grand {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--jal-kurenai);
+    }
+
+    /* Offline QR Code Frame for Phone */
+    .qr-scanner-box {
+      border-left: 2px dashed var(--tatami-border);
+      padding-left: 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: #FAF8F5;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .qr-scan-badge {
+      background: var(--jal-kurenai);
+      color: white;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+    .qr-white-frame {
+      background: white;
+      border: 3px solid var(--sumi-black);
+      border-radius: 14px;
+      padding: 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+      margin-bottom: 12px;
+      transition: transform 0.2s;
+    }
+    .qr-white-frame:hover {
+      transform: scale(1.03);
+    }
+    .qr-white-frame img {
+      width: 155px;
+      height: 155px;
+      display: block;
+      border-radius: 6px;
+    }
+    .qr-ip-notice {
+      font-size: 11px;
+      color: var(--slate-text);
+      font-weight: 700;
+      background: white;
+      border: 1px solid #CBD5E1;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      margin-bottom: 10px;
+      word-break: break-all;
+    }
+    .qr-caption {
+      font-size: 11px;
+      color: var(--muted-gray);
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    .direct-open-link {
+      display: inline-block;
+      font-size: 11px;
+      color: var(--jal-kurenai);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    /* Pass Bottom Tear Strip */
+    .tear-strip {
+      background: #FDFBF8;
+      border-top: 1px solid var(--tatami-border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted-gray);
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 760px) {
+      body { padding: 10px 8px; }
+      .lifecycle-stepper {
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start;
+        padding: 6px 12px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .lifecycle-stepper::-webkit-scrollbar { display: none; }
+      .step-pill { flex-shrink: 0; font-size: 11px; padding: 4px 10px; }
+      .pass-details-split { grid-template-columns: 1fr; padding: 18px; gap: 20px; }
+      .qr-scanner-box { border-left: none; border-top: 2px dashed var(--tatami-border); padding-left: 0; padding-top: 20px; }
+      .iata-code { font-size: 26px; }
+      .route-path-line { width: 60px; }
+      .laptop-phone-pairing-banner { flex-direction: column; gap: 12px; text-align: center; padding: 12px; }
+      .btn-open-crew-laptop { width: 100%; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Systematic Flight Lifecycle Stepper -->
+  <div class="lifecycle-stepper">
+    <div class="step-pill current">🎫 Step 1: Scan QR Code</div>
+    <span class="step-div">&rarr;</span>
+    <div class="step-pill locked">📝 Step 2: Form on Phone</div>
+    <span class="step-div">&rarr;</span>
+    <div class="step-pill locked">🔐 Step 3: Login on Phone</div>
+    <span class="step-div">&rarr;</span>
+    <div class="step-pill locked">🚶 Step 4: Boarding</div>
+    <span class="step-div">&rarr;</span>
+    <div class="step-pill locked">🛫 Step 5: Takeoff &amp; In-Flight Operations</div>
+  </div>
+
+  <!-- Simultaneous Multi-Passenger Demo Suite (3 Boarding Passes) -->
+  <div class="simultaneous-demo-container" style="width:100%; max-width:860px; background:#0F172A; border:1.5px solid #38BDF8; border-radius:14px; padding:18px 24px; margin-bottom:20px; color:#F8FAFC; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+      <div>
+        <span style="background:#38BDF8; color:#0F172A; font-size:11px; font-weight:900; padding:2px 8px; border-radius:10px; text-transform:uppercase;">Multi-Passenger In-Flight Simulation</span>
+        <h3 style="font-size:16px; font-weight:800; margin-top:4px; color:#FFFFFF;">3 Boarding Passes Ready for Simultaneous Requests & Chat</h3>
+        <p style="font-size:12px; color:#94A3B8;">Launch all 3 passengers in separate tabs to test simultaneous queuing on Crew Tablet & Seat-to-Seat chat.</p>
+      </div>
+      <a href="/crew" target="_blank" style="background:#C8102E; color:white; padding:8px 16px; border-radius:8px; text-decoration:none; font-weight:800; font-size:12px;">
+        🧑‍✈️ Open Crew Tablet &rarr;
+      </a>
+    </div>
+
+    <!-- 3 Passenger Fast-Launch Grid -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:12px;">
+      <!-- Passenger 1 -->
+      <div style="background:rgba(255,255,255,0.04); border:1.5px solid #10B981; border-radius:10px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:10px; font-weight:800; color:#10B981;">PASSENGER 1 (HINDI)</span>
+          <span style="font-size:11px; font-weight:900; color:#FFFFFF; background:#10B981; padding:1px 6px; border-radius:4px;">SEAT 24K</span>
+        </div>
+        <div style="font-size:14px; font-weight:800; color:#FFFFFF; margin:6px 0 2px 0;">Aarav Sharma</div>
+        <div style="font-size:11px; color:#94A3B8;">Zone B · Economy (Y)</div>
+        <a href="/passenger?seat=24K&lang=hi" target="_blank" style="display:block; text-align:center; margin-top:10px; background:#10B981; color:#0A1118; font-size:11px; font-weight:800; padding:6px 12px; border-radius:6px; text-decoration:none;">
+          Launch Seat 24K Tab &rarr;
+        </a>
+      </div>
+
+      <!-- Passenger 2 -->
+      <div style="background:rgba(255,255,255,0.04); border:1.5px solid #38BDF8; border-radius:10px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:10px; font-weight:800; color:#38BDF8;">PASSENGER 2 (PUNJABI)</span>
+          <span style="font-size:11px; font-weight:900; color:#FFFFFF; background:#38BDF8; padding:1px 6px; border-radius:4px;">SEAT 12A</span>
+        </div>
+        <div style="font-size:14px; font-weight:800; color:#FFFFFF; margin:6px 0 2px 0;">Priya Patel</div>
+        <div style="font-size:11px; color:#94A3B8;">Zone A · Economy (Y)</div>
+        <a href="/passenger?seat=12A&lang=pa" target="_blank" style="display:block; text-align:center; margin-top:10px; background:#38BDF8; color:#0A1118; font-size:11px; font-weight:800; padding:6px 12px; border-radius:6px; text-decoration:none;">
+          Launch Seat 12A Tab &rarr;
+        </a>
+      </div>
+
+      <!-- Passenger 3 -->
+      <div style="background:rgba(255,255,255,0.04); border:1.5px solid #F59E0B; border-radius:10px; padding:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:10px; font-weight:800; color:#F59E0B;">PASSENGER 3 (ENGLISH)</span>
+          <span style="font-size:11px; font-weight:900; color:#FFFFFF; background:#F59E0B; padding:1px 6px; border-radius:4px;">SEAT 14B</span>
+        </div>
+        <div style="font-size:14px; font-weight:800; color:#FFFFFF; margin:6px 0 2px 0;">Rajesh Singh</div>
+        <div style="font-size:11px; color:#94A3B8;">Zone A · Economy (Y)</div>
+        <a href="/passenger?seat=14B&lang=en" target="_blank" style="display:block; text-align:center; margin-top:10px; background:#F59E0B; color:#0A1118; font-size:11px; font-weight:800; padding:6px 12px; border-radius:6px; text-decoration:none;">
+          Launch Seat 14B Tab &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Laptop Monitoring Banner -->
+  <div class="laptop-phone-pairing-banner">
+    <div class="pair-left">
+      <div class="pair-icon">💻 ⇄ 📱</div>
+      <div>
+        <div class="pair-title">Laptop + Smartphone Demonstration Setup</div>
+        <div class="pair-sub">Operate as passenger on your phone. Monitor cabin crew operations on this laptop!</div>
+      </div>
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <a href="/crew" target="_blank" class="btn-open-crew-laptop">
+        🧑‍✈️ Open Crew Tablet on this Laptop &rarr;
+      </a>
+      <a href="/surveillance" target="_blank" class="btn-open-crew-laptop" style="background:#0F172A; border:1px solid #334155; color:#38BDF8;">
+        🛰️ Master Surveillance Cockpit &rarr;
+      </a>
+    </div>
+  </div>
+
+  <div class="boarding-card">
+    <!-- Top Crane Bar -->
+    <div class="card-top-banner">
+      <div class="brand-cluster">
+        <div class="tsuru-crest">鶴</div>
+        <div>
+          <div class="brand-text-jp">JAPAN AIRLINES</div>
+          <div class="brand-sub-en">ELECTRONIC BOARDING PASS • AIR-GAPPED PASSENGER GATEWAY</div>
+        </div>
+      </div>
+      <div class="flight-capsule">FLIGHT JL 740</div>
+    </div>
+
+    <!-- Route Visual -->
+    <div class="flight-route-bar">
+      <div class="airport-block">
+        <div class="iata-code">DEL</div>
+        <div class="airport-full">Delhi (Indira Gandhi T3)</div>
+      </div>
+      <div class="route-mid-visual">
+        <div class="route-path-line">
+          <span class="airplane-glyph">✈️</span>
+        </div>
+        <div style="font-size: 11px; font-weight: 700; color: #64748B;">Boeing 787-9 • 7h 45m Non-Stop</div>
+      </div>
+      <div class="airport-block" style="text-align: right;">
+        <div class="iata-code">HND</div>
+        <div class="airport-full">Tokyo (Haneda Terminal 3)</div>
+      </div>
+    </div>
+
+    <!-- Pass Details & QR -->
+    <div class="pass-details-split">
+      <div class="passenger-meta-grid">
+        <div class="meta-cell">
+          <div class="meta-label">Passenger Name</div>
+          <div class="meta-val">SHARMA / AARAV MR</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Assigned Seat</div>
+          <div class="seat-grand">24K</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Boarding Time</div>
+          <div class="meta-val">19:40 IST</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Departure Time</div>
+          <div class="meta-val">20:20 IST</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Gate &amp; Terminal</div>
+          <div class="meta-val">GATE 14 • T3</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Cabin Class</div>
+          <div class="meta-val">Economy (Y) • Zone B</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Language Setting</div>
+          <div class="meta-val">Hindi / English / 日本語</div>
+        </div>
+        <div class="meta-cell">
+          <div class="meta-label">Aircraft Edge Network</div>
+          <div class="meta-val" style="color: #16A34A;">● Wi-Fi Hotspot Ready</div>
+        </div>
+      </div>
+
+      <!-- Scannable Offline QR for Mobile Phone -->
+      <div class="qr-scanner-box">
+        <div class="qr-scan-badge">📱 POINT PHONE CAMERA HERE</div>
+        <div class="qr-white-frame">
+          <img src="/api/qr" alt="Scan QR Code to open form on phone" id="qrImg">
+        </div>
+        <div style="display:flex; gap:6px; align-items:center; width:100%; margin-bottom:10px;">
+          <div class="qr-ip-notice" id="phoneUrlNotice" style="margin-bottom:0; flex:1;">
+            Loading Wi-Fi link...
+          </div>
+          <button onclick="copyPhoneUrl()" id="btnCopyUrl" style="background:#0F172A; color:#38BDF8; border:1px solid #334155; border-radius:6px; padding:6px 10px; font-size:11px; font-weight:800; cursor:pointer; white-space:nowrap;">
+            📋 Copy
+          </button>
+        </div>
+        <div class="qr-caption">
+          Scan with your smartphone camera to launch the passenger app on your phone.
+        </div>
+        <a href="/form" class="direct-open-link" id="directFormLink">
+          Or click here to test form on this browser &rarr;
+        </a>
+        <a href="/language" class="direct-open-link" style="margin-top:6px; background:#F8FAFC; color:#0F172A; border:1px solid #CBD5E1;">
+          🌐 Or choose language directly (/language) &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- Tear Strip -->
+    <div class="tear-strip">
+      <div>AIR-GAPPED PASSENGER COMPANION • ZERO SATELLITE BANDWIDTH</div>
+      <div style="font-family: monospace; letter-spacing: 3px; font-weight: 700;">||| | |||| | ||| |||| | |</div>
+    </div>
+  </div>
+
+  <script>
+    // Fetch live local Wi-Fi IP so the exact phone URL is displayed
+    fetch("/api/network-info")
+      .then(res => res.json())
+      .then(data => {
+        if (data.phone_url) {
+          document.getElementById("phoneUrlNotice").innerText = data.phone_url;
+        }
+      })
+      .catch(() => {
+        document.getElementById("phoneUrlNotice").innerText = `http://${location.host}/form`;
+      });
+
+    function copyPhoneUrl() {
+      const url = document.getElementById("phoneUrlNotice").innerText.trim();
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById("btnCopyUrl");
+        btn.innerText = "✓ Copied!";
+        btn.style.color = "#4ADE80";
+        setTimeout(() => {
+          btn.innerText = "📋 Copy";
+          btn.style.color = "#38BDF8";
+        }, 2000);
+      }).catch(() => {});
+    }
+  </script>
+
+</body>
+</html>

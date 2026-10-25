@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAL In-Flight Portal Login — STEP 3</title>
+  <style>
+    :root {
+      --jal-kurenai: #BA0C2F;
+      --jal-kurenai-dark: #8A001E;
+      --sumi-black: #0A1118;
+      --washi-cream: #F9F8F5;
+      --card-white: #FFFFFF;
+      --tatami-border: #E8E5DF;
+      --slate-text: #1E293B;
+      --muted-gray: #64748B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; }
+    
+    body {
+      background: #EDEAE4;
+      background-image: radial-gradient(#D8D4CC 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--slate-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    /* Lifecycle Stepper */
+    .lifecycle-stepper {
+      width: 100%;
+      max-width: 560px;
+      background: var(--card-white);
+      border-radius: 30px;
+      border: 1px solid var(--tatami-border);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(10,17,24,0.04);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted-gray);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    .step-item.active {
+      background: var(--jal-kurenai);
+      color: white;
+    }
+    .step-arrow { color: #CBD5E1; font-size: 11px; }
+
+    /* Login Box */
+    .login-container-card {
+      max-width: 540px;
+      width: 100%;
+      background: var(--card-white);
+      border-radius: 20px;
+      box-shadow: 0 20px 48px rgba(10, 17, 24, 0.1);
+      border: 1px solid var(--tatami-border);
+      overflow: hidden;
+    }
+    .login-hdr-bar {
+      background: var(--sumi-black);
+      color: white;
+      padding: 24px 28px;
+      text-align: center;
+      border-bottom: 4px solid var(--jal-kurenai);
+    }
+    .login-brand-title {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+    }
+    .login-brand-sub {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 3px;
+    }
+
+    .login-card-body {
+      padding: 28px;
+    }
+
+    /* Role Tabs */
+    .segmented-role-row {
+      display: flex;
+      background: #F1EFEA;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      gap: 4px;
+    }
+    .tab-click-btn {
+      flex: 1;
+      padding: 10px 14px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-click-btn.active {
+      background: white;
+      color: var(--sumi-black);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .form-group-line {
+      margin-bottom: 18px;
+    }
+    .field-tag-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .login-txt-box {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--tatami-border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      background: #FDFBF8;
+      transition: border-color 0.2s;
+    }
+    .login-txt-box:focus {
+      border-color: var(--jal-kurenai);
+      box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.1);
+    }
+    .help-hint-line {
+      font-size: 11px;
+      color: var(--muted-gray);
+      margin-top: 4px;
+    }
+
+    .btn-login-main {
+      width: 100%;
+      background: var(--jal-kurenai);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(186, 12, 47, 0.25);
+      transition: background 0.2s;
+      margin-top: 10px;
+    }
+    .btn-login-main:hover {
+      background: var(--jal-kurenai-dark);
+    }
+
+    /* Judge 1-Click Fast Fill */
+    .fast-track-box {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--tatami-border);
+      text-align: center;
+    }
+    .fast-track-title {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .fast-track-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .fast-track-btn {
+      background: #F8F7F4;
+      border: 1px solid var(--tatami-border);
+      padding: 10px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--slate-text);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .fast-track-btn:hover {
+      border-color: var(--jal-kurenai);
+      background: #FFF5F5;
+    }
+
+    .err-callout {
+      display: none;
+      background: #FEE2E2;
+      color: #991B1B;
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 16px;
+      text-align: center;
+      border: 1px solid #FCA5A5;
+    }
+
+    /* Mobile & Responsive Optimization */
+    .btn-login-main:active, .fast-track-btn:active {
+      transform: scale(0.98);
+    }
+    @media (max-width: 600px) {
+      body {
+        padding: 8px 6px;
+        min-height: 100dvh;
+      }
+      .lifecycle-stepper {
+        padding: 6px 10px;
+        border-radius: 14px;
+        font-size: 11px;
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .lifecycle-stepper::-webkit-scrollbar { display: none; }
+      .step-item { padding: 4px 8px; font-size: 11px; flex-shrink: 0; }
+      .login-container-card {
+        border-radius: 16px;
+      }
+      .login-hdr-bar {
+        padding: 18px 16px;
+      }
+      .login-card-body {
+        padding: 18px 16px;
+      }
+      .login-txt-box {
+        font-size: 16px; /* Prevents iOS Safari auto-zoom */
+        padding: 12px;
+      }
+      .fast-track-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Systematic Flight Lifecycle Stepper -->
+  <div class="lifecycle-stepper">
+    <a href="/ticket" class="step-item">🎫 1. Boarding Pass</a>
+    <span class="step-arrow">&rarr;</span>
+    <a href="/form" class="step-item">📝 2. Registration</a>
+    <span class="step-arrow">&rarr;</span>
+    <div class="step-item active">🔐 3. Login</div>
+    <span class="step-arrow">&rarr;</span>
+    <a href="/passenger?phase=boarding" class="step-item">🚶 4. Boarding</a>
+    <span class="step-arrow">&rarr;</span>
+    <a href="/crew" class="step-item">🛫 5. Takeoff &amp; Cruise</a>
+  </div>
+
+  <div class="login-container-card">
+    <div class="login-hdr-bar">
+      <div class="login-brand-title">JAL IN-FLIGHT GATEWAY (搭乗ゲート認証)</div>
+      <div class="login-brand-sub">STEP 3 OF 5 • PRIVACY FIREWALL ACCESS</div>
+    </div>
+
+    <div class="login-card-body">
+      <!-- Portal Selector -->
+      <div class="segmented-role-row">
+        <button type="button" class="tab-click-btn active" id="btnRolePass" onclick="setLoginRole('passenger')">👤 Passenger Login (乗客)</button>
+        <button type="button" class="tab-click-btn" id="btnRoleCrew" onclick="setLoginRole('crew')">🧑‍✈️ Cabin Crew Login (客室乗務員)</button>
+      </div>
+
+      <div class="err-callout" id="errorStrip">
+        Invalid credentials. Please verify your 3-letter ID and Date of Birth password.
+      </div>
+
+      <form id="authForm" onsubmit="executeLogin(event)">
+        <!-- Login ID -->
+        <div class="form-group-line">
+          <label class="field-tag-label" id="lblId">Passenger Login ID (3 Letters)</label>
+          <input type="text" id="authId" class="login-txt-box" placeholder="e.g. AAR" maxlength="10" required>
+          <div class="help-hint-line" id="hintId">First 3 letters of your registered name (e.g., AAR for Aarav).</div>
+        </div>
+
+        <!-- Password (DOB) -->
+        <div class="form-group-line">
+          <label class="field-tag-label" id="lblPw">Password (Date of Birth: DDMMYYYY)</label>
+          <input type="password" id="authPw" class="login-txt-box" placeholder="e.g. 14051998" required>
+          <div class="help-hint-line" id="hintPw">Your Date of Birth in DDMMYYYY format (e.g. 14051998).</div>
+        </div>
+
+        <button type="submit" class="btn-login-main" id="btnSubmitLogin">
+          Proceed to Step 4: Boarding &rarr;
+        </button>
+      </form>
+
+      <!-- Fast Track Demo Buttons -->
+      <div class="fast-track-box">
+        <div class="fast-track-title">⚡ Instant Hackathon Demo Logins:</div>
+        <div class="fast-track-grid">
+          <button type="button" class="fast-track-btn" onclick="autoFillLogin('AAR', '14051998', 'passenger')">
+            <div><strong>Aarav Sharma</strong></div>
+            <div style="font-size: 11px; color: #64748B;">ID: AAR • Seat 24K</div>
+          </button>
+          <button type="button" class="fast-track-btn" onclick="autoFillLogin('YUK', '20081995', 'crew')">
+            <div><strong>Yukiko Tanaka</strong></div>
+            <div style="font-size: 11px; color: #64748B;">ID: YUK • Purser Tablet</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedRole = "passenger";
+
+    function setLoginRole(role) {
+      selectedRole = role;
+      const tabP = document.getElementById("btnRolePass");
+      const tabC = document.getElementById("btnRoleCrew");
+      const lblId = document.getElementById("lblId");
+      const lblPw = document.getElementById("lblPw");
+      const hintId = document.getElementById("hintId");
+      const hintPw = document.getElementById("hintPw");
+      const authId = document.getElementById("authId");
+      const authPw = document.getElementById("authPw");
+
+      document.getElementById("errorStrip").style.display = "none";
+
+      if (role === "passenger") {
+        tabP.classList.add("active");
+        tabC.classList.remove("active");
+        lblId.innerText = "Passenger Login ID (3 Letters)";
+        lblPw.innerText = "Password (Date of Birth: DDMMYYYY)";
+        hintId.innerText = "First 3 letters of your registered name (e.g., AAR for Aarav).";
+        hintPw.innerText = "Your Date of Birth in DDMMYYYY format (e.g. 14051998).";
+        authId.value = "AAR";
+        authPw.value = "14051998";
+      } else {
+        tabC.classList.add("active");
+        tabP.classList.remove("active");
+        lblId.innerText = "Crew Login ID (先頭3文字)";
+        lblPw.innerText = "Crew Password (生年月日: DDMMYYYY)";
+        hintId.innerText = "First 3 letters of crew name (e.g., YUK for Yukiko).";
+        hintPw.innerText = "Crew Date of Birth in DDMMYYYY format (e.g. 20081995).";
+        authId.value = "YUK";
+        authPw.value = "20081995";
+      }
+    }
+
+    function autoFillLogin(id, pw, role) {
+      setLoginRole(role);
+      document.getElementById("authId").value = id;
+      document.getElementById("authPw").value = pw;
+      executeLogin(new Event("submit"));
+    }
+
+    // Auto-parse query params
+    window.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const r = params.get("role") || "passenger";
+      const id = params.get("id");
+      const dob = params.get("dob");
+
+      setLoginRole(r);
+      if (id) document.getElementById("authId").value = id;
+      if (dob) document.getElementById("authPw").value = dob;
+    });
+
+    async function executeLogin(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      const id = document.getElementById("authId").value.trim().toUpperCase();
+      const pw = document.getElementById("authPw").value.trim();
+
+      try {
+        const res = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: selectedRole, id: id, password: pw })
+        });
+        const data = await res.json();
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentLang = urlParams.get("lang") || localStorage.getItem("flylingo_lang") || "hi";
+
+        if (data.status === "OK") {
+          // Direct to systematic Step 4 Boarding!
+          if (selectedRole === "passenger") {
+            window.location.href = `/passenger?seat=${data.seat || '24K'}&lang=${encodeURIComponent(currentLang)}&phase=boarding`;
+          } else {
+            window.location.href = `/crew?phase=boarding`;
+          }
+        } else {
+          document.getElementById("errorStrip").style.display = "block";
+          document.getElementById("errorStrip").innerText = data.message || "Invalid credentials.";
+        }
+      } catch(err) {
+        // Offline direct routing fallback
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentLang = urlParams.get("lang") || localStorage.getItem("flylingo_lang") || "hi";
+        if (selectedRole === "passenger") {
+          window.location.href = `/passenger?lang=${encodeURIComponent(currentLang)}&phase=boarding`;
+        } else {
+          window.location.href = `/crew?phase=boarding`;
+        }
+      }
+    }
+  </script>
+
+</body>
+</html>

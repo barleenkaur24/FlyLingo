@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAL Flight JL740 — Master Surveillance & Operations Command</title>
+  <style>
+    :root {
+      --jal-kurenai: #C8102E;
+      --jal-kurenai-dark: #8A001E;
+      --sumi-navy: #0B1120;
+      --card-bg: #151F32;
+      --card-border: #24344D;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --matcha-green: #10B981;
+      --yamabuki-amber: #F59E0B;
+      --akane-red: #EF4444;
+      --asagi-blue: #38BDF8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Kaku Gothic ProN", Meiryo, monospace; }
+
+    body {
+      background: var(--sumi-navy);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Top Command Header */
+    .master-header {
+      background: #090E1A;
+      border-bottom: 3px solid var(--jal-kurenai);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    }
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .crane-logo {
+      width: 38px;
+      height: 38px;
+      background: var(--jal-kurenai);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 900;
+      color: white;
+      box-shadow: 0 0 14px rgba(200, 16, 46, 0.6);
+    }
+    .title-box h1 {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .title-box .sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Telemetry HUD */
+    .telemetry-hud {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: #111A2E;
+      border: 1px solid var(--card-border);
+      padding: 6px 18px;
+      border-radius: 30px;
+    }
+    .hud-stat {
+      text-align: center;
+    }
+    .hud-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      color: #64748B;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .hud-val {
+      font-size: 13px;
+      font-weight: 900;
+      color: var(--asagi-blue);
+      font-family: monospace;
+    }
+
+    .surveillance-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--matcha-green);
+      color: var(--matcha-green);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+      animation: pulseGlow 2s infinite;
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(16, 185, 129, 0); }
+      50% { box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+    }
+
+    /* Global Action Controls */
+    .quick-nav-bar {
+      background: #0D1526;
+      border-bottom: 1px solid var(--card-border);
+      padding: 8px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .btn-nav-link {
+      background: #1E293B;
+      color: #CBD5E1;
+      text-decoration: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-weight: 700;
+      transition: all 0.15s;
+      border: 1px solid #334155;
+    }
+    .btn-nav-link:hover {
+      background: #334155;
+      color: white;
+    }
+
+    /* Main 3-Column Surveillance Grid */
+    .master-grid {
+      display: grid;
+      grid-template-columns: 340px 1fr 380px;
+      gap: 16px;
+      padding: 16px 24px;
+      flex: 1;
+    }
+
+    /* Cards */
+    .surv-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+    .card-header {
+      background: #111A2E;
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    .card-body {
+      padding: 14px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* Column 1: Passenger Domain Surveillance */
+    .passenger-badge-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .stat-pill {
+      flex: 1;
+      background: #0D1526;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+    }
+    .stat-num { font-size: 20px; font-weight: 900; color: white; }
+    .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
+
+    .passenger-active-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .passenger-item {
+      background: #0E1729;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .seat-chip {
+      background: var(--asagi-blue);
+      color: #0F172A;
+      font-weight: 900;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    /* Column 2: Boeing 787 Master Cabin Schematic */
+    .fuselage-container {
+      background: #0B1120;
+      border: 1.5px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      position: relative;
+      text-align: center;
+    }
+    .cabin-nose-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+    }
+    .schematic-rows-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 480px;
+      overflow-y: auto;
+      padding: 0 10px;
+    }
+    .fuselage-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .row-no {
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748B;
+      width: 22px;
+      text-align: right;
+    }
+    .seat-cluster {
+      display: flex;
+      gap: 4px;
+    }
+    .radar-seat {
+      width: 32px;
+      height: 32px;
+      background: #1E293B;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: #CBD5E1;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .radar-seat:hover {
+      transform: scale(1.15);
+      border-color: white;
+      z-index: 10;
+    }
+    .radar-seat.active-online {
+      background: #0369A1;
+      border-color: #38BDF8;
+      color: white;
+    }
+    .radar-seat.call-green {
+      background: var(--matcha-green) !important;
+      color: white;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.8);
+      animation: callBounce 1.5s infinite;
+    }
+    .radar-seat.resolving-amber {
+      background: var(--yamabuki-amber) !important;
+      color: #0F172A;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.8);
+    }
+    .radar-seat.alert-red {
+      background: var(--akane-red) !important;
+      color: white;
+      box-shadow: 0 0 18px rgba(239, 68, 68, 1);
+      animation: emergencyPulse 0.8s infinite;
+    }
+    @keyframes emergencyPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.18); opacity: 0.6; }
+    }
+    @keyframes callBounce {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+    .aisle-gap {
+      width: 14px;
+      color: #334155;
+      font-size: 9px;
+    }
+
+    /* Radar Legend */
+    .radar-legend {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin-top: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-box { width: 12px; height: 12px; border-radius: 3px; }
+
+    /* Column 3: Crew & Queue Surveillance */
+    .crew-status-banner {
+      background: #0E1729;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .queue-stream {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 440px;
+      overflow-y: auto;
+    }
+    .stream-card {
+      background: #0F182A;
+      border-left: 4px solid var(--matcha-green);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      position: relative;
+    }
+    .stream-card.HIGH {
+      border-left-color: var(--akane-red);
+      background: #2D0813;
+    }
+    .stream-card.RESOLVING {
+      border-left-color: var(--yamabuki-amber);
+    }
+    .stream-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-weight: 800;
+    }
+    .stream-ja {
+      font-size: 13px;
+      color: white;
+      margin-bottom: 2px;
+    }
+    .stream-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Bottom: Aircraft Black Box Event Recorder (Audit Log Stream) */
+    .black-box-tray {
+      background: #090E1A;
+      border-top: 1px solid var(--card-border);
+      padding: 14px 24px;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    }
+    .tray-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .audit-terminal {
+      background: #030712;
+      border: 1px solid #1E293B;
+      border-radius: 8px;
+      height: 120px;
+      overflow-y: auto;
+      padding: 8px 14px;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+    .audit-row {
+      display: flex;
+      gap: 12px;
+    }
+    .audit-time { color: #64748B; }
+    .audit-tag { font-weight: 800; }
+    .tag-PASSENGER { color: #38BDF8; }
+    .tag-CREW { color: #34D399; }
+    .tag-EMERGENCY { color: #F87171; font-weight: 900; }
+    .tag-SYSTEM { color: #FBBF24; }
+
+    /* Control Toolbar */
+    .sim-toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn-sim {
+      background: #1E293B;
+      color: white;
+      border: 1px solid #334155;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-sim:hover { background: #334155; }
+    .btn-sim.red { background: var(--jal-kurenai); border-color: var(--jal-kurenai-dark); }
+    .btn-sim.red:hover { background: #E11D48; }
+
+    /* Responsive & Mobile Optimization */
+    .btn-sim:active, .btn-nav-link:active {
+      transform: scale(0.96);
+    }
+    @media (max-width: 1240px) {
+      .master-grid {
+        grid-template-columns: 1fr 380px;
+      }
+      .col-passenger-panel {
+        grid-column: 1 / -1;
+      }
+      .telemetry-hud {
+        gap: 10px;
+        padding: 4px 12px;
+      }
+    }
+    @media (max-width: 860px) {
+      .master-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 12px 14px;
+      }
+      .telemetry-hud {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-radius: 12px;
+        gap: 6px;
+        padding: 8px 10px;
+      }
+      .quick-nav-bar {
+        padding: 8px 14px;
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+      }
+      .quick-nav-bar > div {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .master-grid {
+        grid-template-columns: 1fr;
+        padding: 10px;
+        gap: 12px;
+      }
+      .col-passenger-panel {
+        grid-column: 1;
+      }
+      .audit-log-box {
+        height: 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Command Header -->
+  <header class="master-header">
+    <div class="brand-group">
+      <div class="crane-logo">鶴</div>
+      <div class="title-box">
+        <h1>
+          <span>JAPAN AIRLINES</span>
+          <span style="color: var(--jal-kurenai);">•</span>
+          <span>MASTER SURVEILLANCE &amp; OPERATIONS CONTROL</span>
+        </h1>
+        <div class="sub">Aircraft Surveillance Node • Boeing 787-9 Dreamliner (JL740 Delhi &rarr; Tokyo Haneda)</div>
+      </div>
+    </div>
+
+    <!-- Live Telemetry HUD -->
+    <div class="telemetry-hud">
+      <div class="hud-stat">
+        <div class="hud-label">Flight Phase</div>
+        <div class="hud-val" id="hudPhase" style="color: #34D399;">CRUISING</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Altitude</div>
+        <div class="hud-val" id="hudAlt">35,000 FT</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Speed</div>
+        <div class="hud-val">890 KM/H</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Cabin Temp</div>
+        <div class="hud-val">22.5°C</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">Outside</div>
+        <div class="hud-val">-52°C</div>
+      </div>
+      <div class="hud-stat">
+        <div class="hud-label">ETA Haneda</div>
+        <div class="hud-val">05:40 JST</div>
+      </div>
+    </div>
+
+    <!-- Active Surveillance Status Badge & Mute Toggle -->
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button id="btnMuteToggle" class="btn-sim" onclick="toggleAudioMute()" style="background:#1E293B; border-color:#38BDF8; color:#38BDF8; padding:6px 12px; border-radius:20px;">
+        🔊 Sound On
+      </button>
+      <div class="surveillance-badge">
+        <span>●</span>
+        <span>SURVEILLANCE RADAR ACTIVE</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Quick Nav Toolbar -->
+  <div class="quick-nav-bar">
+    <div style="display: flex; gap: 8px;">
+      <a href="/ticket" class="btn-nav-link" target="_blank">🎫 Boarding Pass</a>
+      <a href="/form" class="btn-nav-link" target="_blank">📝 Passenger Form</a>
+      <a href="/login" class="btn-nav-link" target="_blank">🔐 Gate Login</a>
+      <a href="/passenger" class="btn-nav-link" target="_blank">📱 Passenger Phone</a>
+      <a href="/crew" class="btn-nav-link" target="_blank">💻 Crew Tablet</a>
+    </div>
+
+    <div class="sim-toolbar">
+      <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">COMMAND OVERRIDES:</span>
+      <button class="btn-sim red" onclick="simulateMedicalSOS()">🚨 Trigger Medical SOS (24K)</button>
+      <button class="btn-sim" onclick="simulateWaterCall()">💧 Trigger Water Call (21C)</button>
+      <button class="btn-sim" onclick="playAviationChime()">🔔 Broadcast Chime</button>
+      <button class="btn-sim" onclick="clearAllCalls()">🧹 Clear All Calls</button>
+    </div>
+  </div>
+
+  <!-- Main 3-Column Surveillance Grid -->
+  <main class="master-grid">
+
+    <!-- Column 1: Passenger Surveillance -->
+    <div class="surv-card">
+      <div class="card-header">
+        <span>📱 PASSENGER DOMAIN SURVEILLANCE</span>
+        <span id="passCountBadge" style="color: var(--asagi-blue);">1 Active</span>
+      </div>
+      <div class="card-body">
+        <div class="passenger-badge-row">
+          <div class="stat-pill">
+            <div class="stat-num" id="statConnectedPass">1</div>
+            <div class="stat-label">Online Phones</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-num" id="statActiveRequests">0</div>
+            <div class="stat-label">Active Requests</div>
+          </div>
+          <div class="stat-pill">
+            <div class="stat-num" id="statResolvedTotal" style="color: var(--matcha-green);">1</div>
+            <div class="stat-label">Resolved</div>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+          Connected Passenger Devices (Real-Time)
+        </div>
+        <div class="passenger-active-list" id="passengerListContainer">
+          <div class="passenger-item">
+            <div>
+              <div style="font-weight: 800;">Aarav Sharma</div>
+              <div style="font-size: 10px; color: var(--text-muted);">ID: AAR • DOB: 14051998</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="seat-chip">SEAT 24K</span>
+              <div style="font-size: 10px; color: var(--matcha-green); margin-top: 3px;">● In-Flight PWA Active</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+          Zero-Knowledge Privacy Shield
+        </div>
+        <div style="background: #0D1526; border: 1px solid #1E293B; border-radius: 8px; padding: 10px; font-size: 11px; color: #94A3B8; line-height: 1.5;">
+          🛡️ <strong>PII Isolation Status:</strong> Active<br>
+          • Passenger passport, phone, and DOB are filtered.<br>
+          • Crew only sees operational flight attributes.
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 2: Boeing 787 Master Cabin Schematic -->
+    <div class="surv-card">
+      <div class="card-header">
+        <span>✈️ BOEING 787-9 GLOBAL CABIN RADAR</span>
+        <span style="font-size: 11px; color: var(--text-muted);">Rows 20 to 26 • Economy Zone B</span>
+      </div>
+      <div class="card-body">
+        <div class="fuselage-container">
+          <div class="cabin-nose-tag">&and; FORWARD CABIN / BUSINESS CLASS &and;</div>
+          <div class="schematic-rows-wrap" id="schematicWrap">
+            <!-- Dynamically populated via JS -->
+          </div>
+          <div class="cabin-nose-tag" style="margin-top: 14px; margin-bottom: 0;">&or; AFT GALLEY / RESTROOMS &or;</div>
+        </div>
+
+        <div class="radar-legend">
+          <div class="legend-item"><div class="legend-box" style="background: #1E293B; border: 1px solid #334155;"></div> Idle</div>
+          <div class="legend-item"><div class="legend-box" style="background: #0369A1;"></div> Seated</div>
+          <div class="legend-item"><div class="legend-box" style="background: var(--matcha-green);"></div> Request (Green)</div>
+          <div class="legend-item"><div class="legend-box" style="background: var(--yamabuki-amber);"></div> Resolving (Amber)</div>
+          <div class="legend-item"><div class="legend-box" style="background: var(--akane-red);"></div> Emergency (Red)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 3: Cabin Crew & Priority Queue Surveillance -->
+    <div class="surv-card">
+      <div class="card-header">
+        <span>💻 CREW OPERATIONS &amp; QUEUE SURVEILLANCE</span>
+        <span id="crewTabletBadge" style="color: var(--matcha-green);">1 Tablet Online</span>
+      </div>
+      <div class="card-body">
+        <div class="crew-status-banner">
+          <div>
+            <div style="font-weight: 800;">Purser: Yukiko Tanaka</div>
+            <div style="font-size: 10px; color: var(--text-muted);">Emp ID: YUK • Zone B Attendant</div>
+          </div>
+          <div style="text-align: right;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--matcha-green);">● ON DUTY</div>
+            <div style="font-size: 10px; color: var(--text-muted);">Latency: &lt; 2ms</div>
+          </div>
+        </div>
+
+        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+          Live In-Flight Priority Queue Array
+        </div>
+        <div class="queue-stream" id="queueStreamContainer">
+          <div style="color: #64748B; text-align: center; padding: 30px 0; font-size: 12px;" id="emptyQueueMsg">
+            No active calls in flight queue.<br>(All passenger requests resolved)
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Bottom: Aircraft Black Box Event Recorder (Audit Log Stream) -->
+  <footer class="black-box-tray">
+    <div class="tray-header">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 14px;">📼</span>
+        <span>AIRCRAFT BLACK BOX EVENT RECORDER (CABIN AUDIT LOG STREAM)</span>
+      </div>
+      <div style="font-size: 11px; color: #64748B;">Auto-Scrolling • High-Precision Real-Time Microsecond Clock</div>
+    </div>
+    <div class="audit-terminal" id="auditLogTerminal">
+      <!-- Live rows appended here -->
+    </div>
+  </footer>
+
+  <script>
+    const wsProto = location.protocol === "https:" ? "wss:" : "ws:";
+    let ws = null;
+    let seatStates = {};
+    let activeQueue = [];
+    let isAudioMuted = false;
+
+    function toggleAudioMute() {
+      isAudioMuted = !isAudioMuted;
+      const btn = document.getElementById("btnMuteToggle");
+      if (btn) {
+        btn.innerText = isAudioMuted ? "🔇 Muted" : "🔊 Sound On";
+        btn.style.color = isAudioMuted ? "#94A3B8" : "#38BDF8";
+        btn.style.borderColor = isAudioMuted ? "#475569" : "#38BDF8";
+      }
+    }
+
+    // Synthesize Boeing 787 2-tone cabin chime (Offline Web Audio API)
+    function playAviationChime() {
+      if (isAudioMuted) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioCtx();
+        const now = ctx.currentTime;
+        const osc1 = ctx.createOscillator();
+        const gain1 = ctx.createGain();
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        gain1.gain.setValueAtTime(0.3, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+        osc1.connect(gain1);
+        gain1.connect(ctx.destination);
+        osc1.start(now);
+        osc1.stop(now + 1.2);
+
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.frequency.setValueAtTime(440.00, now + 0.35); // A4
+        gain2.gain.setValueAtTime(0.3, now + 0.35);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now + 0.35);
+        osc2.stop(now + 1.8);
+      } catch(e) {}
+    }
+
+    // Build Fuselage Radar Map (Rows 20 to 26)
+    function renderRadarMap() {
+      const wrap = document.getElementById("schematicWrap");
+      wrap.innerHTML = "";
+      const rows = [20, 21, 22, 23, 24, 25, 26];
+
+      rows.forEach(r => {
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "fuselage-row";
+
+        const lbl = document.createElement("div");
+        lbl.className = "row-no";
+        lbl.innerText = r;
+        rowDiv.appendChild(lbl);
+
+        // Left 3: A, B, C
+        const leftGrp = document.createElement("div");
+        leftGrp.className = "seat-cluster";
+        ['A', 'B', 'C'].forEach(c => {
+          leftGrp.appendChild(createRadarSeat(`${r}${c}`));
+        });
+        rowDiv.appendChild(leftGrp);
+
+        // Aisle
+        const aisle = document.createElement("div");
+        aisle.className = "aisle-gap";
+        aisle.innerText = "|";
+        rowDiv.appendChild(aisle);
+
+        // Right 3: D, E, K
+        const rightGrp = document.createElement("div");
+        rightGrp.className = "seat-cluster";
+        ['D', 'E', 'K'].forEach(c => {
+          rightGrp.appendChild(createRadarSeat(`${r}${c}`));
+        });
+        rowDiv.appendChild(rightGrp);
+
+        wrap.appendChild(rowDiv);
+      });
+
+      // Default: Seat 24K is seated
+      setRadarSeatState("24K", "active-online");
+    }
+
+    function createRadarSeat(seatId) {
+      const el = document.createElement("div");
+      el.className = "radar-seat";
+      el.id = `radar-seat-${seatId}`;
+      el.innerText = seatId;
+      el.onclick = () => inspectSeat(seatId);
+      return el;
+    }
+
+    function setRadarSeatState(seatId, stateClass) {
+      const el = document.getElementById(`radar-seat-${seatId}`);
+      if (el) {
+        el.className = "radar-seat";
+        if (stateClass) el.classList.add(stateClass);
+      }
+    }
+
+    function inspectSeat(seatId) {
+      appendAuditRow("SYSTEM", "SEAT_INSPECT", seatId, `Operator inspected Seat ${seatId}`);
+    }
+
+    // Connect Surveillance WebSocket
+    function connectSurveillanceSocket() {
+      ws = new WebSocket(`${wsProto}//${location.host}/ws/surveillance`);
+
+      ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log("Surveillance WebSocket Event:", data);
+
+        if (data.type === "initial_snapshot") {
+          activeQueue = data.priority_queue || [];
+          renderQueueView();
+          (data.audit_log || []).reverse().forEach(log => {
+            appendAuditRow(log.source, log.type, log.seat, log.details, log.priority, log.timestamp);
+          });
+        } else if (data.type === "queue_update" || data.type === "new_alert") {
+          activeQueue = data.priority_queue || activeQueue;
+          if (data.new_alert) {
+            const isEm = data.new_alert.priority === "HIGH" || data.new_alert.category === "MEDICAL";
+            setRadarSeatState(data.new_alert.seat, isEm ? "alert-red" : "call-green");
+            playAviationChime();
+          }
+          renderQueueView();
+        } else if (data.type === "resolving_started") {
+          setRadarSeatState(data.seat, "resolving-amber");
+          renderQueueView();
+        } else if (data.type === "passenger_mark_resolved") {
+          activeQueue = data.priority_queue || activeQueue.filter(q => q.seat !== data.seat);
+          setRadarSeatState(data.seat, "active-online");
+          renderQueueView();
+        } else if (data.type === "audit_event" && data.event) {
+          const ev = data.event;
+          appendAuditRow(ev.source, ev.type, ev.seat, ev.details, ev.priority, ev.timestamp);
+        }
+      };
+
+      ws.onclose = function() {
+        setTimeout(connectSurveillanceSocket, 2500);
+      };
+    }
+
+    function renderQueueView() {
+      const container = document.getElementById("queueStreamContainer");
+      const emptyMsg = document.getElementById("emptyQueueMsg");
+      const statReq = document.getElementById("statActiveRequests");
+
+      statReq.innerText = activeQueue.length;
+
+      if (activeQueue.length === 0) {
+        container.innerHTML = "";
+        container.appendChild(emptyMsg);
+        emptyMsg.style.display = "block";
+        return;
+      }
+
+      emptyMsg.style.display = "none";
+      container.innerHTML = "";
+
+      activeQueue.forEach((q, idx) => {
+        const isEm = q.priority === "HIGH" || q.category === "MEDICAL";
+        const card = document.createElement("div");
+        card.className = `stream-card ${isEm ? 'HIGH' : (q.status || 'NORMAL')}`;
+
+        card.innerHTML = `
+          <div class="stream-top">
+            <span>SEAT ${q.seat} • Position #${idx + 1}</span>
+            <span style="color: ${isEm ? '#EF4444' : '#10B981'}; font-size: 10px;">
+              ${isEm ? '🚨 EMERGENCY' : '● ROUTINE CALL'}
+            </span>
+          </div>
+          <div class="stream-ja">${q.translated_ja || 'お伺いいたします。'}</div>
+          <div class="stream-sub">
+            <strong>Original:</strong> "${q.original_text || q.english_text || 'Call'}"
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function appendAuditRow(source, type, seat, details, priority, timeStr) {
+      const terminal = document.getElementById("auditLogTerminal");
+      const now = timeStr || new Date().toTimeString().split(' ')[0];
+      const row = document.createElement("div");
+      row.className = "audit-row";
+
+      row.innerHTML = `
+        <span class="audit-time">[${now}]</span>
+        <span class="audit-tag tag-${source || 'SYSTEM'}">${source}</span>
+        <span style="color: #CBD5E1; font-weight: 700;">${type}</span>
+        ${seat ? `<span style="color: var(--asagi-blue); font-weight: 800;">[SEAT ${seat}]</span>` : ''}
+        <span style="color: #94A3B8;">${details}</span>
+      `;
+      terminal.appendChild(row);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    // Command Overrides
+    function simulateMedicalSOS() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          action: "simulate_sos",
+          seat: "24K"
+        }));
+      }
+      setRadarSeatState("24K", "alert-red");
+      playAviationChime();
+    }
+
+    function simulateWaterCall() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+          action: "simulate_water",
+          seat: "21C"
+        }));
+      }
+      setRadarSeatState("21C", "call-green");
+      playAviationChime();
+    }
+
+    function clearAllCalls() {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ action: "clear_all" }));
+      }
+      activeQueue = [];
+      renderQueueView();
+      for (let r = 20; r <= 26; r++) {
+        ['A','B','C','D','E','K'].forEach(c => setRadarSeatState(`${r}${c}`, null));
+      }
+      setRadarSeatState("24K", "active-online");
+    }
+
+    // Init
+    renderRadarMap();
+    connectSurveillanceSocket();
+
+    // Initial audit log entries
+    appendAuditRow("SYSTEM", "BOOT", null, "Master In-Flight Surveillance Node online on Boeing 787-9 edge");
+    appendAuditRow("SYSTEM", "NETWORK", null, "Local LAN IP: 172.16.73.34 • Port: 8000 (Air-Gapped)");
+    appendAuditRow("PASSENGER", "CONNECTED", "24K", "Passenger Aarav Sharma (ID: AAR) connected to In-Flight PWA");
+    appendAuditRow("CREW", "CONNECTED", "TABLET", "Attendant Yukiko Tanaka on-duty (Zone B Rows 20-26)");
+  </script>
+
+</body>
+</html>

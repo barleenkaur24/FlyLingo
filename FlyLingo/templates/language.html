@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FlyLingo — Choose Language</title>
+  <style>
+    :root{--red:#C8102E;--ink:#111827;--paper:#F9F8F5;--line:#E8E5DF;--muted:#64748B}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;background:#EDEAE5;color:var(--ink);font-family:Arial,Helvetica,sans-serif;display:flex;align-items:center;justify-content:center;padding:18px}
+    .panel{width:100%;max-width:460px;background:var(--paper);border:1px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:0 16px 42px #11182718}
+    header{background:var(--ink);color:white;padding:22px;text-align:center;border-bottom:4px solid var(--red)}.mark{margin:0 auto 10px;width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:var(--red);font-size:24px;font-weight:800}header h1{font-size:19px;margin:0 0 5px;letter-spacing:.5px}header p{font-size:12px;color:#CBD5E1;margin:0}
+    main{padding:22px}h2{font-size:22px;text-align:center;margin:0 0 6px} .hint{text-align:center;font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.5}
+    .languages{display:grid;grid-template-columns:1fr 1fr;gap:10px}.language{min-height:66px;text-align:left;border:1px solid var(--line);border-radius:13px;background:white;padding:12px;cursor:pointer;color:var(--ink)}.language:focus,.language:hover{outline:2px solid var(--red);border-color:var(--red)}.native{display:block;font-size:17px;font-weight:700;margin-bottom:4px}.english{display:block;font-size:12px;color:var(--muted)}
+    .continue{width:100%;margin-top:18px;border:0;border-radius:12px;background:var(--red);color:white;padding:14px;font-weight:800;font-size:15px;cursor:pointer}.continue:disabled{opacity:.45;cursor:not-allowed}.foot{text-align:center;font-size:10px;line-height:1.5;color:var(--muted);padding:0 22px 20px}
+    @media(max-width:360px){.languages{grid-template-columns:1fr}.panel{border-radius:18px}}
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <header><div class="mark">鶴</div><h1>FlyLingo</h1><p>JAPAN AIRLINES · CABIN ASSISTANCE</p></header>
+    <main>
+      <h2>Choose your language</h2>
+      <p class="hint">Select the language you are most comfortable with.<br>次の画面は選択した言語で表示されます。</p>
+      <div class="languages" role="group" aria-label="Choose language">
+        <button class="language" data-lang="en"><span class="native">English</span><span class="english">English</span></button>
+        <button class="language" data-lang="hi"><span class="native">हिन्दी</span><span class="english">Hindi</span></button>
+        <button class="language" data-lang="pa"><span class="native">ਪੰਜਾਬੀ</span><span class="english">Punjabi</span></button>
+        <button class="language" data-lang="ja"><span class="native">日本語</span><span class="english">Japanese</span></button>
+        <button class="language" data-lang="ta"><span class="native">தமிழ்</span><span class="english">Tamil</span></button>
+        <button class="language" data-lang="te"><span class="native">తెలుగు</span><span class="english">Telugu</span></button>
+        <button class="language" data-lang="bn"><span class="native">বাংলা</span><span class="english">Bengali</span></button>
+      </div>
+      <button class="continue" id="continueBtn" disabled>Continue →</button>
+    </main>
+    <div class="foot">Local cabin network · Designed to open without internet<br>Language selection is stored in this page URL for the next screen.</div>
+  </div>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const seat = params.get('seat') || '24K';
+    let selected = null;
+    const continueBtn = document.getElementById('continueBtn');
+    document.querySelectorAll('.language').forEach(button => {
+      button.addEventListener('click', () => {
+        selected = button.dataset.lang;
+        document.querySelectorAll('.language').forEach(b => { b.style.background = b === button ? '#FFF1F2' : '#FFFFFF'; b.style.borderColor = b === button ? '#C8102E' : '#E8E5DF'; });
+        continueBtn.disabled = false;
+        const labels = {en:'Continue →',hi:'आगे बढ़ें →',pa:'ਜਾਰੀ ਰੱਖੋ →',ja:'次へ進む →',ta:'தொடரவும் →',te:'కొనసాగించండి →',bn:'চালিয়ে যান →'};
+        continueBtn.textContent = labels[selected] || labels.en;
+      });
+    });
+    continueBtn.addEventListener('click', () => {
+      if (!selected) return;
+      localStorage.setItem('flylingo_lang', selected);
+      localStorage.setItem('jal_preferred_lang', selected);
+      location.href = '/passenger?seat=' + encodeURIComponent(seat) + '&lang=' + encodeURIComponent(selected);
+    });
+  </script>
+</body>
+</html>

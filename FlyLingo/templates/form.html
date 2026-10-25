@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAL Pre-Flight Registration — STEP 2</title>
+  <style>
+    :root {
+      --jal-kurenai: #BA0C2F;
+      --jal-kurenai-dark: #8A001E;
+      --sumi-black: #0A1118;
+      --washi-cream: #F9F8F5;
+      --card-white: #FFFFFF;
+      --tatami-border: #E8E5DF;
+      --slate-text: #1E293B;
+      --muted-gray: #64748B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; }
+    
+    body {
+      background: #EDEAE4;
+      background-image: radial-gradient(#D8D4CC 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--slate-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    /* Lifecycle Stepper */
+    .lifecycle-stepper {
+      width: 100%;
+      max-width: 660px;
+      background: var(--card-white);
+      border-radius: 30px;
+      border: 1px solid var(--tatami-border);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(10,17,24,0.04);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted-gray);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    .step-item.active {
+      background: var(--jal-kurenai);
+      color: white;
+    }
+    .step-arrow { color: #CBD5E1; font-size: 11px; }
+
+    /* Form Card */
+    .form-container-card {
+      max-width: 660px;
+      width: 100%;
+      background: var(--card-white);
+      border-radius: 20px;
+      box-shadow: 0 20px 48px rgba(10, 17, 24, 0.1);
+      border: 1px solid var(--tatami-border);
+      overflow: hidden;
+    }
+    .form-card-header {
+      background: var(--sumi-black);
+      color: white;
+      padding: 22px 28px;
+      border-bottom: 4px solid var(--jal-kurenai);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hdr-title-jp {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .hdr-sub-en {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+
+    .form-card-body {
+      padding: 28px;
+    }
+
+    /* Role Toggle */
+    .role-segmented-tabs {
+      display: flex;
+      background: #F1EFEA;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      gap: 4px;
+    }
+    .role-tab-btn {
+      flex: 1;
+      padding: 11px 16px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-tab-btn.active {
+      background: white;
+      color: var(--sumi-black);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .form-row {
+      margin-bottom: 18px;
+    }
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .text-input, .select-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--tatami-border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #FDFBF8;
+    }
+    .text-input:focus, .select-input:focus {
+      border-color: var(--jal-kurenai);
+      box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.1);
+    }
+
+    /* Real-Time Credential Calculation Box */
+    .calculated-cred-card {
+      background: #EFF6FF;
+      border: 1.5px solid #BFDBFE;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 22px;
+    }
+    .calc-head {
+      font-size: 12px;
+      font-weight: 800;
+      color: #1E40AF;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .calc-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .computed-badge {
+      font-weight: 900;
+      color: var(--sumi-black);
+      font-family: monospace;
+      font-size: 14px;
+      background: white;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid #DBEAFE;
+    }
+
+    .form-actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn-submit-reg {
+      flex: 2;
+      background: var(--jal-kurenai);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(186, 12, 47, 0.25);
+      transition: background 0.2s;
+    }
+    .btn-submit-reg:hover {
+      background: var(--jal-kurenai-dark);
+    }
+    .btn-quick-fill {
+      flex: 1;
+      background: #E8E5DF;
+      color: var(--slate-text);
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-quick-fill:hover {
+      background: #D8D4CA;
+    }
+
+    /* Modal Confirmation */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 17, 24, 0.75);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 200;
+    }
+    .modal-box {
+      background: white;
+      max-width: 480px;
+      width: 100%;
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.25);
+      animation: popModal 0.3s ease-out;
+    }
+    @keyframes popModal {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-check-crest {
+      width: 56px;
+      height: 56px;
+      background: #DCFCE7;
+      color: #16A34A;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 16px auto;
+    }
+    .modal-h {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--sumi-black);
+      margin-bottom: 6px;
+    }
+    .modal-p {
+      font-size: 13px;
+      color: var(--muted-gray);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .modal-cred-strip {
+      background: #F8F7F4;
+      border: 1px solid var(--tatami-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .modal-advance-btn {
+      display: block;
+      background: var(--jal-kurenai);
+      color: white;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      box-shadow: 0 4px 14px rgba(186, 12, 47, 0.3);
+    }
+
+    /* Mobile & Responsive Optimization */
+    .btn-submit-reg:active, .btn-quick-fill:active, .demo-shortcut-banner:active {
+      transform: scale(0.98);
+    }
+    @media (max-width: 680px) {
+      body {
+        padding: 8px 6px;
+        min-height: 100dvh;
+      }
+      .lifecycle-stepper {
+        padding: 6px 10px;
+        border-radius: 14px;
+        font-size: 11px;
+        overflow-x: auto;
+        white-space: nowrap;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .lifecycle-stepper::-webkit-scrollbar { display: none; }
+      .step-item { padding: 4px 8px; font-size: 11px; flex-shrink: 0; }
+      .form-container-card {
+        border-radius: 16px;
+        border: 1px solid var(--tatami-border);
+      }
+      .form-card-header {
+        padding: 16px 18px;
+      }
+      .hdr-title-jp { font-size: 15px; }
+      .form-card-body {
+        padding: 16px 14px;
+      }
+      .text-input, .select-input {
+        font-size: 16px; /* Prevents iOS Safari auto-zoom */
+        padding: 12px;
+      }
+      .form-actions-row {
+        flex-direction: column-reverse;
+        gap: 10px;
+      }
+      .btn-submit-reg, .btn-quick-fill {
+        width: 100%;
+        padding: 14px;
+        font-size: 14px;
+      }
+      .modal-box {
+        padding: 24px 18px;
+        border-radius: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Systematic Flight Lifecycle Stepper -->
+  <div class="lifecycle-stepper">
+    <a href="/ticket" class="step-item">🎫 1. Boarding Pass</a>
+    <span class="step-arrow">&rarr;</span>
+    <div class="step-item active">📝 2. Registration</div>
+    <span class="step-arrow">&rarr;</span>
+    <a href="/login" class="step-item">🔐 3. Login</a>
+    <span class="step-arrow">&rarr;</span>
+    <a href="/passenger?phase=boarding" class="step-item">🚶 4. Boarding</a>
+    <span class="step-arrow">&rarr;</span>
+    <a href="/crew" class="step-item">🛫 5. Takeoff &amp; Cruise</a>
+  </div>
+
+  <div class="form-container-card">
+    <div class="form-card-header">
+      <div>
+        <div class="hdr-title-jp">PRE-FLIGHT REGISTRATION (搭乗前登録)</div>
+        <div class="hdr-sub-en">STEP 2 OF 5 • FLIGHT JL740 (DEL &rarr; HND)</div>
+      </div>
+      <div style="font-size: 22px;">📋</div>
+    </div>
+
+    <div class="form-card-body">
+      <!-- 1-Tap Fast Track for Judges and Mobile Demo -->
+      <div class="demo-shortcut-banner" onclick="quickFillAndProceed()" style="background: linear-gradient(135deg, #1E293B, #0F172A); border: 1.5px solid #38BDF8; color: white; border-radius: 12px; padding: 12px 14px; margin-bottom: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2); transition: transform 0.15s;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 20px;">⚡</span>
+          <div>
+            <div style="font-weight: 800; font-size: 13px; color: #38BDF8;">Judge / Demo 1-Tap Fast Track</div>
+            <div style="font-size: 11px; color: #94A3B8;">Auto-fill Seat 24K and advance to in-flight portal</div>
+          </div>
+        </div>
+        <span style="background: #38BDF8; color: #0F172A; font-weight: 800; font-size: 11px; padding: 6px 12px; border-radius: 8px; flex-shrink: 0;">1-Tap &rarr;</span>
+      </div>
+
+      <!-- Role Tabs -->
+      <div class="role-segmented-tabs">
+        <button type="button" class="role-tab-btn active" id="tabPass" onclick="switchRole('passenger')">👤 Passenger (乗客)</button>
+        <button type="button" class="role-tab-btn" id="tabCrew" onclick="switchRole('crew')">🧑‍✈️ Cabin Crew (客室乗務員)</button>
+      </div>
+
+      <form id="preFlightForm" onsubmit="submitRegistration(event)">
+        <!-- Full Name -->
+        <div class="form-row">
+          <label class="field-label" id="lblFullName">Passenger Full Name (氏名)</label>
+          <input type="text" id="inputName" class="text-input" placeholder="e.g. Aarav Sharma" required oninput="calculateCreds()">
+        </div>
+
+        <!-- Date of Birth -->
+        <div class="form-row">
+          <label class="field-label">Date of Birth (生年月日: YYYY-MM-DD)</label>
+          <input type="date" id="inputDob" class="text-input" value="1998-05-14" required oninput="calculateCreds()">
+        </div>
+
+        <!-- Passenger specific -->
+        <div id="passengerSection">
+          <div class="form-row">
+            <label class="field-label">Seat Assignment (指定座席)</label>
+            <select id="selectSeat" class="select-input">
+              <option value="24K" selected>24K (Window - Economy B)</option>
+              <option value="20C">20C (Aisle - Economy B)</option>
+              <option value="21B">21B (Middle - Economy B)</option>
+              <option value="25D">25D (Aisle - Economy B)</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label class="field-label">Language Preference (言語 / भाषा / Language)</label>
+            <select id="selectLang" class="select-input">
+              <option value="hi" selected>Hindi &amp; English (हिन्दी / English)</option>
+              <option value="en">English (International)</option>
+              <option value="ja">Japanese (日本語)</option>
+              <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+              <option value="ta">Tamil (தமிழ்)</option>
+              <option value="te">Telugu (తెలుగు)</option>
+              <option value="bn">Bengali (বাংলা)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Crew specific -->
+        <div id="crewSection" style="display: none;">
+          <div class="form-row">
+            <label class="field-label">Purser / Employee ID</label>
+            <input type="text" id="crewEmpId" class="text-input" value="JAL-7809">
+          </div>
+          <div class="form-row">
+            <label class="field-label">Cabin Station</label>
+            <select id="crewStation" class="select-input">
+              <option value="Economy Zone B" selected>Zone B (Rows 20-26)</option>
+              <option value="Economy Zone A">Zone A (Rows 14-19)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Credentials Calculation Card -->
+        <div class="calculated-cred-card">
+          <div class="calc-head">🔑 Automatically Generated Login Credentials:</div>
+          <div class="calc-line">
+            <span>Login ID (First 3 Letters):</span>
+            <span class="computed-badge" id="badgeId">AAR</span>
+          </div>
+          <div class="calc-line">
+            <span>Password (Date of Birth DDMMYYYY):</span>
+            <span class="computed-badge" id="badgePw">14051998</span>
+          </div>
+        </div>
+
+        <div class="form-actions-row">
+          <button type="button" class="btn-quick-fill" onclick="fillQuickDemo()">⚡ Quick Demo Fill</button>
+          <button type="submit" class="btn-submit-reg">✓ Submit &amp; Proceed to Step 3 &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Success Advance Modal -->
+  <div class="modal-backdrop" id="advanceModal">
+    <div class="modal-box">
+      <div class="modal-check-crest">✓</div>
+      <div class="modal-h">Step 2 Registration Complete!</div>
+      <div class="modal-p">
+        Your profile is synchronized with the onboard local edge server. Please proceed to the Login Portal with your credentials below:
+      </div>
+
+      <div class="modal-cred-strip">
+        <div style="font-size: 11px; font-weight: 800; color: #64748B; margin-bottom: 6px;">YOUR COMPUTED CREDENTIALS:</div>
+        <div style="margin-bottom: 4px;"><strong>ID:</strong> <span id="mId" style="color: #BA0C2F; font-family: monospace; font-size: 16px;">AAR</span></div>
+        <div><strong>Password:</strong> <span id="mPw" style="color: #0A1118; font-family: monospace; font-size: 16px;">14051998</span></div>
+      </div>
+
+      <a href="/login" class="modal-advance-btn" id="btnAdvanceLogin">
+        Proceed to Step 3: Login Portal &rarr;
+      </a>
+    </div>
+  </div>
+
+  <script>
+    let activeRole = "passenger";
+
+    function switchRole(role) {
+      activeRole = role;
+      const tabP = document.getElementById("tabPass");
+      const tabC = document.getElementById("tabCrew");
+      const pSec = document.getElementById("passengerSection");
+      const cSec = document.getElementById("crewSection");
+      const nameLbl = document.getElementById("lblFullName");
+
+      if (role === "passenger") {
+        tabP.classList.add("active");
+        tabC.classList.remove("active");
+        pSec.style.display = "block";
+        cSec.style.display = "none";
+        nameLbl.innerText = "Passenger Full Name (氏名)";
+        document.getElementById("inputName").value = "Aarav Sharma";
+        document.getElementById("inputDob").value = "1998-05-14";
+      } else {
+        tabC.classList.add("active");
+        tabP.classList.remove("active");
+        pSec.style.display = "none";
+        cSec.style.display = "block";
+        nameLbl.innerText = "Cabin Attendant Name (乗務員氏名)";
+        document.getElementById("inputName").value = "Yukiko Tanaka";
+        document.getElementById("inputDob").value = "1995-08-20";
+      }
+      calculateCreds();
+    }
+
+    function calculateCreds() {
+      const name = document.getElementById("inputName").value.trim().toUpperCase();
+      const dob = document.getElementById("inputDob").value;
+      
+      let id = name.replace(/[^A-Z]/g, "").slice(0, 3);
+      if (id.length < 3) id = (id + "XXX").slice(0, 3);
+
+      let pw = "14051998";
+      if (dob && dob.includes("-")) {
+        const parts = dob.split("-");
+        pw = parts[2] + parts[1] + parts[0]; // DDMMYYYY
+      }
+
+      document.getElementById("badgeId").innerText = id;
+      document.getElementById("badgePw").innerText = pw;
+      return { id, pw };
+    }
+
+    function fillQuickDemo() {
+      if (activeRole === "passenger") {
+        document.getElementById("inputName").value = "Aarav Sharma";
+        document.getElementById("inputDob").value = "1998-05-14";
+        document.getElementById("selectSeat").value = "24K";
+      } else {
+        document.getElementById("inputName").value = "Yukiko Tanaka";
+        document.getElementById("inputDob").value = "1995-08-20";
+        document.getElementById("crewEmpId").value = "JAL-7809";
+      }
+      calculateCreds();
+    }
+
+    async function submitRegistration(e) {
+      e.preventDefault();
+      const creds = calculateCreds();
+      const name = document.getElementById("inputName").value.trim();
+      const dob = document.getElementById("inputDob").value;
+      const seat = activeRole === "passenger" ? document.getElementById("selectSeat").value : "CREW-TABLET";
+
+      try {
+        await fetch("/api/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            role: activeRole,
+            name: name,
+            dob: dob,
+            id: creds.id,
+            password: creds.pw,
+            seat: seat
+          })
+        });
+      } catch(err) {}
+
+      const chosenLang = document.getElementById("selectLang") ? document.getElementById("selectLang").value : "hi";
+      localStorage.setItem("flylingo_lang", chosenLang);
+      localStorage.setItem("jal_preferred_lang", chosenLang);
+
+      document.getElementById("mId").innerText = creds.id;
+      document.getElementById("mPw").innerText = creds.pw;
+      document.getElementById("btnAdvanceLogin").href = `/login?role=${activeRole}&id=${creds.id}&dob=${creds.pw}&lang=${encodeURIComponent(chosenLang)}`;
+      document.getElementById("advanceModal").style.display = "flex";
+    }
+
+    function quickFillAndProceed() {
+      if (navigator.vibrate) navigator.vibrate(20);
+      fillQuickDemo();
+      submitRegistration({ preventDefault: () => {} });
+    }
+
+    calculateCreds();
+  </script>
+
+</body>
+</html>

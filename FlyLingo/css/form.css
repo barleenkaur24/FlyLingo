@@ -1,0 +1,285 @@
+/* === FORM STYLESHEET (JAL OMOTENASHI DESIGN) === */
+
+:root {
+      --jal-kurenai: #BA0C2F;
+      --jal-kurenai-dark: #8A001E;
+      --sumi-black: #0A1118;
+      --washi-cream: #F9F8F5;
+      --card-white: #FFFFFF;
+      --tatami-border: #E8E5DF;
+      --slate-text: #1E293B;
+      --muted-gray: #64748B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif; }
+    
+    body {
+      background: #EDEAE4;
+      background-image: radial-gradient(#D8D4CC 1px, transparent 1px);
+      background-size: 20px 20px;
+      color: var(--slate-text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    /* Lifecycle Stepper */
+    .lifecycle-stepper {
+      width: 100%;
+      max-width: 660px;
+      background: var(--card-white);
+      border-radius: 30px;
+      border: 1px solid var(--tatami-border);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(10,17,24,0.04);
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted-gray);
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    .step-item.active {
+      background: var(--jal-kurenai);
+      color: white;
+    }
+    .step-arrow { color: #CBD5E1; font-size: 11px; }
+
+    /* Form Card */
+    .form-container-card {
+      max-width: 660px;
+      width: 100%;
+      background: var(--card-white);
+      border-radius: 20px;
+      box-shadow: 0 20px 48px rgba(10, 17, 24, 0.1);
+      border: 1px solid var(--tatami-border);
+      overflow: hidden;
+    }
+    .form-card-header {
+      background: var(--sumi-black);
+      color: white;
+      padding: 22px 28px;
+      border-bottom: 4px solid var(--jal-kurenai);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .hdr-title-jp {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .hdr-sub-en {
+      font-size: 11px;
+      color: #94A3B8;
+      margin-top: 2px;
+    }
+
+    .form-card-body {
+      padding: 28px;
+    }
+
+    /* Role Toggle */
+    .role-segmented-tabs {
+      display: flex;
+      background: #F1EFEA;
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      gap: 4px;
+    }
+    .role-tab-btn {
+      flex: 1;
+      padding: 11px 16px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-tab-btn.active {
+      background: white;
+      color: var(--sumi-black);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .form-row {
+      margin-bottom: 18px;
+    }
+    .field-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .text-input, .select-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--tatami-border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #FDFBF8;
+    }
+    .text-input:focus, .select-input:focus {
+      border-color: var(--jal-kurenai);
+      box-shadow: 0 0 0 3px rgba(186, 12, 47, 0.1);
+    }
+
+    /* Real-Time Credential Calculation Box */
+    .calculated-cred-card {
+      background: #EFF6FF;
+      border: 1.5px solid #BFDBFE;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 22px;
+    }
+    .calc-head {
+      font-size: 12px;
+      font-weight: 800;
+      color: #1E40AF;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .calc-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .computed-badge {
+      font-weight: 900;
+      color: var(--sumi-black);
+      font-family: monospace;
+      font-size: 14px;
+      background: white;
+      padding: 3px 10px;
+      border-radius: 6px;
+      border: 1px solid #DBEAFE;
+    }
+
+    .form-actions-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+    .btn-submit-reg {
+      flex: 2;
+      background: var(--jal-kurenai);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(186, 12, 47, 0.25);
+      transition: background 0.2s;
+    }
+    .btn-submit-reg:hover {
+      background: var(--jal-kurenai-dark);
+    }
+    .btn-quick-fill {
+      flex: 1;
+      background: #E8E5DF;
+      color: var(--slate-text);
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-quick-fill:hover {
+      background: #D8D4CA;
+    }
+
+    /* Modal Confirmation */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 17, 24, 0.75);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 200;
+    }
+    .modal-box {
+      background: white;
+      max-width: 480px;
+      width: 100%;
+      border-radius: 20px;
+      padding: 32px 28px;
+      text-align: center;
+      box-shadow: 0 24px 50px rgba(0,0,0,0.25);
+      animation: popModal 0.3s ease-out;
+    }
+    @keyframes popModal {
+      from { transform: scale(0.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .modal-check-crest {
+      width: 56px;
+      height: 56px;
+      background: #DCFCE7;
+      color: #16A34A;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin: 0 auto 16px auto;
+    }
+    .modal-h {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--sumi-black);
+      margin-bottom: 6px;
+    }
+    .modal-p {
+      font-size: 13px;
+      color: var(--muted-gray);
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .modal-cred-strip {
+      background: #F8F7F4;
+      border: 1px solid var(--tatami-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: left;
+      margin-bottom: 24px;
+    }
+    .modal-advance-btn {
+      display: block;
+      background: var(--jal-kurenai);
+      color: white;
+      text-decoration: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      box-shadow: 0 4px 14px rgba(186, 12, 47, 0.3);
+    }
