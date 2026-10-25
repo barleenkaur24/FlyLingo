@@ -1,0 +1,32 @@
+﻿# Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Translation model weights and configuration files
+offline_translation/model.safetensors
+offline_translation/*.safetensors
+offline_translation/pytorch_model*.bin
+offline_translation_reverse/model.safetensors
+offline_translation_reverse/*.safetensors
+offline_translation_reverse/pytorch_model*.bin
+
+# ML caches
+.cache/
+cache/
+huggingface_cache/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
